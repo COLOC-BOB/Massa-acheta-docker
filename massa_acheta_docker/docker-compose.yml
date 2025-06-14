@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  massa_acheta:
+    build: .
+    container_name: massa_acheta
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - ./app_results.json:/app/app_results.json
+      - ./deferred_credits.json:/app/deferred_credits.json
+      - ./app_stat.json:/app/app_stat.json
+      - ./public_dir.json:/app/public_dir.json
