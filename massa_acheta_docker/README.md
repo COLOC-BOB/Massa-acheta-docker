@@ -1,19 +1,19 @@
-````markdown
+
 # MASSA 🦗 Acheta_docker
 
 **Deploy with Docker (Docker Compose)**
 
 You can deploy MASSA Acheta easily using Docker for a reproducible, isolated setup.
 
----
 
 ## Prepare your environment
 
 1. **Clone the repository:**
-   ```
+
+    ```
    git clone https://github.com/COLOC-BOB/massa_acheta_docker.git
    cd massa_acheta
-````
+    ```
 
 2. **Create your environment file (`.env`) at the project root:**
 
@@ -25,16 +25,20 @@ You can deploy MASSA Acheta easily using Docker for a reproducible, isolated set
 3. **Create required empty files at the root:**
 
 > app_results.json:
+>
 > Stores the list of monitored nodes and wallets, their current state, configuration (URL, alias), and wallet tracking per node. It acts as the > main backup of user configuration (mapping: node <-> wallets <-> status).
 >
 > app_stat.json:
+>
 > Contains detailed history and statistics about nodes and wallets, used to restore historical data after a restart (per-period statistics,
 > previous states, and charts displayed in the Telegram interface).
 >
 > public_dir.json:
+>
 > Stores “public” users for multi-user or shared (optional) setups. Used to distinguish public access/settings from the private version.
 >
 > deferred_credits.json:
+>
 > Holds deferred credits for each wallet (e.g. upcoming rewards, scheduled payments, etc.). Used to display future credits for a wallet with
 > the /view_credits Telegram command.
 
