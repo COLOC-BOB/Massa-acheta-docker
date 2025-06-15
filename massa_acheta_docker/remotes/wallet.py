@@ -233,7 +233,12 @@ async def check_wallet(node_name: str = "", wallet_address: str = "") -> None:
 
             app_globals.app_results[node_name]['wallets'][wallet_address]['last_result'] = wallet_result
 
-            final_cycle = wallet_cycle_infos[-2]
+            # Use the previous cycle stats if available,
+            # otherwise fall back to the latest cycle to avoid IndexError
+            if len(wallet_cycle_infos) >= 2:
+                final_cycle = wallet_cycle_infos[-2]
+            else:
+                final_cycle = wallet_cycle_infos[-1]
 
             wallet_last_cycle = 0
             if type(final_cycle.get("cycle", 0)) == int:
