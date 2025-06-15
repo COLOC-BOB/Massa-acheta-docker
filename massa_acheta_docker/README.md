@@ -17,10 +17,19 @@ You can deploy MASSA Acheta easily using Docker for a reproducible, isolated set
 
 2. **Create your environment file (`.env`) at the project root:**
 
+>
+> !! Please check if you have a **Telegram Bot API KEY** and you do know your own **Telegram ID** before start installation
+>
+> How to create a new Telegam Bot and its API KEY: https://www.youtube.com/watch?v=UQrcOj63S2o
+>
+> You can get your own Telegram ID here: https://t.me/getmyid_bot
+>
+
    ```
    echo "ACHETA_KEY=YOUR_TELEGRAM_BOT_TOKEN" > .env
    echo "ACHETA_CHAT=YOUR_TELEGRAM_ID" >> .env
    ```
+   
 
 3. **Create required empty files at the root:**
 
@@ -64,10 +73,12 @@ docker compose up --build -d
 
 Stop the bot:
 
+```
 docker compose down
+```
 
 
-Acheta is a genus of crickets. It most notably contains the house cricket (Acheta domesticus).
+## Acheta is a genus of crickets. It most notably contains the house cricket (Acheta domesticus).
 
 "MASSA Acheta" is a service that will notify you about events occurring on your MASSA node and your wallet.\
 Just like a little cricket!
@@ -75,61 +86,10 @@ Just like a little cricket!
 >
 >First of all let's define that this is not a public Telegram Bot, but opensource software that you can install on your own server to get a personal Bot that will be accessible only to you.
 >
-Public bot with limited functionality is also available here: https://t.me/massa_acheta_bot
-
 
 Before we jump to a detailed description of the service, please watch the video:
 
 [![MASSA Acheta service video](https://img.youtube.com/vi/gdvuhe2iRyY/0.jpg)](https://www.youtube.com/watch?v=gdvuhe2iRyY)
-
-
-
-## Just one command to start:
-
-Copy the following command and paste it into your shell prompt:
-```
-cd ~ && bash <(wget --no-cache -qO- https://raw.githubusercontent.com/dex2code/massa_acheta/main/install.sh)
-```
-
-This command will install, configure and start your Bot automatically.
-
-
->
-> !! Please check if you have a **Telegram Bot API KEY** and you do know your own **Telegram ID** before start installation
->
-> How to create a new Telegam Bot and its API KEY: https://www.youtube.com/watch?v=UQrcOj63S2o
->
-> You can get your own Telegram ID here: https://t.me/getmyid_bot
->
-
-
-You can stop the installation process anywhere by pressing `Ctrl+C`, but before starting the installation again, run the following command to clear all changes made:
-```
-cd ~ && bash <(wget --no-cache -qO- https://raw.githubusercontent.com/dex2code/massa_acheta/main/uninstall.sh)
-```
-
-
-
-## Update Acheta:
-
-Acheta automatically checks for its updates, and if you receive the message “A new version of ACHETA has been released” - please update your installation.
-
-You can do it with one command:
-```
-cd ~ && bash <(wget --no-cache -qO- https://raw.githubusercontent.com/dex2code/massa_acheta/main/update.sh)
-```
-
-This command stops Acheta, deploys all updates ans starts Acheta again.
-
-
-
-## Uninstall Acheta:
-
-You can clean your system with the following command:
-```
-cd ~ && bash <(wget --no-cache -qO- https://raw.githubusercontent.com/dex2code/massa_acheta/main/uninstall.sh)
-```
-
 
 
 ## What can Acheta do:
