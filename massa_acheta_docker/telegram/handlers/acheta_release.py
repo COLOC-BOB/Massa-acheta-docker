@@ -29,7 +29,7 @@ async def cmd_acheta_release(message: Message) -> None:
             "☝ Please update your bot - ",
             TextLink(
                 "More info here",
-                url="https://github.com/dex2code/massa_acheta/"
+                url="https://api.github.com/repos/COLOC-BOB/massa_acheta_docker/releases/latest"
             )
         )
 
