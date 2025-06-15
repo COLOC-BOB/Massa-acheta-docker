@@ -306,7 +306,19 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
                     "borderWidth": 0,
                     "pointRadius": 0,
                     "data": []
-                }
+                },
+                {
+                    "type": "line",
+                    "label": "Est. Rewards / Cycle",
+                    "yAxisID": "blocks",
+                    "lineTension": 0.4,
+                    "fill": True,
+                    "borderColor": "lightgray",
+                    "backgroundColor": "rgba(220, 220, 220, 0.4)",
+                    "borderWidth": 0,
+                    "pointRadius": 0,
+                    "data": []
+                },
             ]
         }
     }
@@ -345,13 +357,17 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
             measure_total_rolls = wallet_stat_keytime_sorted[measure].get("total_rolls", 0)
             measure_ok_blocks = wallet_stat_keytime_sorted[measure].get("ok_blocks", 0)
             measure_nok_blocks = wallet_stat_keytime_sorted[measure].get("nok_blocks", 0)
+            measure_produced_blocks = wallet_stat_keytime_sorted[measure].get("produced_blocks", 0)
+            measure_produced_blocks_cycle = wallet_stat_keytime_sorted[measure].get("produced_blocks_cycle", 0)
 
             wallet_stat_keycycle_unsorted[measure_cycle] = {
                 "balance": measure_balance,
                 "rolls": measure_rolls,
                 "total_rolls": measure_total_rolls,
                 "ok_blocks": measure_ok_blocks,
-                "nok_blocks": measure_nok_blocks
+                "nok_blocks": measure_nok_blocks,
+                "produced_blocks": measure_produced_blocks,
+                "produced_blocks_cycle": measure_produced_blocks_cycle
             }
 
         wallet_stat_keycycle_sorted = dict(
@@ -365,6 +381,7 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
         total_rewards_block_cycle = 0
         delta_balance, delta_rolls = 0, 0
         last_balance, last_rolls = 0, 0
+        total_produced_blocks, total_produced_blocks_cycle = 0, 0 
 
         for cycle in wallet_stat_keycycle_sorted:
             balance = wallet_stat_keycycle_sorted[cycle].get("balance", 0)
@@ -382,7 +399,11 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
             total_rolls = wallet_stat_keycycle_sorted[cycle].get("total_rolls", 0)
             ok_blocks = wallet_stat_keycycle_sorted[cycle].get("ok_blocks", 0)
             nok_blocks = wallet_stat_keycycle_sorted[cycle].get("nok_blocks", 0)
+            produced_blocks = wallet_stat_keycycle_sorted[cycle].get("produced_blocks", 0)
+            produced_blocks_cycle = wallet_stat_keycycle_sorted[cycle].get("produced_blocks_cycle", 0)
             total_blocks += (ok_blocks + nok_blocks)
+            total_produced_blocks += produced_blocks
+            total_produced_blocks_cycle += produced_blocks_cycle
 
             staking_chart_config['data']['labels'].append(cycle)
             staking_chart_config['data']['datasets'][0]['data'].append(rolls)
@@ -398,13 +419,19 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
             rewards_blocks_cycle = await get_rewards_blocks_cycle(rolls_number=rolls, total_rolls=total_rolls)
             blocks_chart_config['data']['datasets'][3]['data'].append(rewards_blocks_cycle)
             total_rewards_block_cycle += rewards_blocks_cycle
-        
+            total_produced_blocks_cycle += produced_blocks_cycle
+
         fact_blocks_per_cycle = round(
-            (total_blocks) / total_cycles,
+            (total_produced_blocks) / total_cycles,
             4
         )
 
         est_blocks_per_cycle = round(
+            total_produced_blocks_cycle / total_cycles,
+            4
+        )
+
+        est_rewards_block_cycle = round(
             total_rewards_block_cycle / total_cycles,
             4
         )
@@ -427,7 +454,8 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
             f"Cycles collected: {total_cycles:,}",
             f"Operated blocks: {total_blocks:,}",
             f"Estimated Blocks / Cycle: {est_blocks_per_cycle:,}",
-            f"Fact Blocks / Cycle: {fact_blocks_per_cycle:,}"
+            f"Fact Blocks / Cycle: {fact_blocks_per_cycle:,}",
+            f"Estimated Rewards / Cycle: {est_rewards_block_cycle:,}"
         )
 
         staking_chart = QuickChart()

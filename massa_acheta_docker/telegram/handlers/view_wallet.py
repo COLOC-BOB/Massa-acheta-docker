@@ -219,6 +219,7 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
         wallet_candidate_rolls = app_globals.app_results[node_name]['wallets'][wallet_address]['candidate_rolls']
         wallet_active_rolls = app_globals.app_results[node_name]['wallets'][wallet_address]['active_rolls']
         wallet_missed_blocks = app_globals.app_results[node_name]['wallets'][wallet_address]['missed_blocks']
+        wallet_produced_blocks = app_globals.app_results[node_name]['wallets'][wallet_address]['produced_blocks']
         wallet_computed_rewards = await get_rewards_mas_day(rolls_number=wallet_active_rolls)
         wallet_thread = app_globals.app_results[node_name]['wallets'][wallet_address]['last_result'].get("thread", 0)
 
@@ -275,6 +276,7 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
             f"💰 Final balance: {wallet_final_balance:,} MAS",
             f"🗞 Candidate / Active rolls: {wallet_candidate_rolls:,} / {wallet_active_rolls:,}",
             f"🥊 Missed blocks: {wallet_missed_blocks}", "",
+            f"🥊 Produced blocks: {wallet_produced_blocks}", "",
             f"🪙 Estimated earnings ≈ {wallet_computed_rewards:,} MAS / Day", "",
             "🔎 Detailed info:", "",
             as_line(f"🧵 Thread: {wallet_thread}"),

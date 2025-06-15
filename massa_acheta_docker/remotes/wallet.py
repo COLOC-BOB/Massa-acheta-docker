@@ -11,14 +11,16 @@ from tools import pull_http_api, get_short_address, t_now
 
 
 @logger.catch
-async def check_wallet(node_name: str="", wallet_address: str="") -> None:
+async def check_wallet(node_name: str = "", wallet_address: str = "") -> None:
     logger.debug(f"-> Enter Def")
 
     if app_globals.app_results[node_name]['last_status'] != True:
-        logger.warning(f"Will not watch wallet '{wallet_address}'@'{node_name}' because of its offline")
+        logger.warning(
+            f"Will not watch wallet '{wallet_address}'@'{node_name}' because of its offline")
 
         app_globals.app_results[node_name]['wallets'][wallet_address]['last_status'] = False
-        app_globals.app_results[node_name]['wallets'][wallet_address]['last_result'] = {"error": "Host node is offline"}
+        app_globals.app_results[node_name]['wallets'][wallet_address]['last_result'] = {
+            "error": "Host node is offline"}
 
         return
 
@@ -40,16 +42,19 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
 
         wallet_result = wallet_answer.get("result", None)
         if not wallet_result:
-            raise Exception(f"Wrong answer from MASSA node API ({str(wallet_answer)})")
+            raise Exception(
+                f"Wrong answer from MASSA node API ({str(wallet_answer)})")
 
         if type(wallet_result) != list or not len(wallet_result):
-            raise Exception(f"Wrong answer from MASSA node API ({str(wallet_answer)})")
+            raise Exception(
+                f"Wrong answer from MASSA node API ({str(wallet_answer)})")
 
         wallet_result = wallet_result[0]
         wallet_result_address = wallet_result.get("address", None)
 
         if wallet_result_address != wallet_address:
-            raise Exception(f"Bad address received from MASSA node API: '{wallet_result_address}' (expected '{wallet_address}')")
+            raise Exception(
+                f"Bad address received from MASSA node API: '{wallet_result_address}' (expected '{wallet_address}')")
 
         wallet_final_balance = 0
         wallet_final_balance = wallet_result.get("final_balance", 0)
@@ -79,7 +84,8 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
                 wallet_missed_blocks += cycle_info.get("nok_count", 0)
 
     except BaseException as E:
-        logger.warning(f"Error watching wallet '{wallet_address}' on '{node_name}': ({str(E)})")
+        logger.warning(
+            f"Error watching wallet '{wallet_address}' on '{node_name}': ({str(E)})")
 
         if app_globals.app_results[node_name]['wallets'][wallet_address]['last_status'] != False:
             t = as_list(
@@ -104,7 +110,8 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
         app_globals.app_results[node_name]['wallets'][wallet_address]['last_result'] = wallet_answer
 
     else:
-        logger.info(f"Got wallet '{wallet_address}'@'{node_name}' info successfully!")
+        logger.info(
+            f"Got wallet '{wallet_address}'@'{node_name}' info successfully!")
 
         if app_globals.app_results[node_name]['wallets'][wallet_address]['last_status'] != True:
             t = as_list(
@@ -172,6 +179,29 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
                 )
                 await queue_telegram_message(message_text=t.as_html())
 
+            # Comparaison avec la dernière valeur connue
+            previous_blocks = app_globals.app_results[node_name]['wallets'][wallet_address].get(
+                'produced_blocks', 0)
+
+            if wallet_operated_blocks > previous_blocks:
+                new_blocks = wallet_operated_blocks - previous_blocks
+
+                for _ in range(new_blocks):
+                    t = as_list(
+                        f"🏠 Node: \"{node_name}\"",
+                        as_line(
+                            f"📍 {app_globals.app_results[node_name]['url']}"),
+                        as_line(
+                            "✅ Nouveau bloc produit par : ",
+                            TextLink(
+                                await get_short_address(address=wallet_address),
+                                url=f"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}"
+                            )
+                        ),
+                        f"📦 Total produits : {previous_blocks:,} → {wallet_operated_blocks:,}"
+                    )
+                    await queue_telegram_message(message_text=t.as_html())
+
             # 4) Check if new blocks missed:
             if wallet_missed_blocks > app_globals.app_results[node_name]['wallets'][wallet_address]['missed_blocks']:
                 t = as_list(
@@ -188,7 +218,7 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
                 )
                 await queue_telegram_message(message_text=t.as_html())
 
-        time_now = await t_now()
+            time_now = await t_now()
 
         try:
             app_globals.app_results[node_name]['wallets'][wallet_address]['last_status'] = True
@@ -198,6 +228,8 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
             app_globals.app_results[node_name]['wallets'][wallet_address]['candidate_rolls'] = wallet_candidate_rolls
             app_globals.app_results[node_name]['wallets'][wallet_address]['active_rolls'] = wallet_active_rolls
             app_globals.app_results[node_name]['wallets'][wallet_address]['missed_blocks'] = wallet_missed_blocks
+            app_globals.app_results[node_name]['wallets'][wallet_address]['produced_blocks'] = wallet_operated_blocks
+
 
             app_globals.app_results[node_name]['wallets'][wallet_address]['last_result'] = wallet_result
 
@@ -213,11 +245,13 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
 
             wallet_last_cycle_operated_blocks = 0
             if type(final_cycle.get("ok_count", 0)) == int:
-                wallet_last_cycle_operated_blocks = final_cycle.get("ok_count", 0)
+                wallet_last_cycle_operated_blocks = final_cycle.get(
+                    "ok_count", 0)
 
             wallet_last_cycle_missed_blocks = 0
             if type(final_cycle.get("nok_count", 0)) == int:
-                wallet_last_cycle_missed_blocks = final_cycle.get("nok_count", 0)
+                wallet_last_cycle_missed_blocks = final_cycle.get(
+                    "nok_count", 0)
 
             app_globals.app_results[node_name]['wallets'][wallet_address]['stat'].append(
                 {
@@ -227,19 +261,21 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
                     "rolls": wallet_active_rolls,
                     "total_rolls": app_globals.massa_network['values']['total_staked_rolls'],
                     "ok_blocks": wallet_last_cycle_operated_blocks,
-                    "nok_blocks": wallet_last_cycle_missed_blocks
+                    "nok_blocks": wallet_last_cycle_missed_blocks,
+                    "produced_blocks": wallet_operated_blocks,
+                    "produced_blocks_cycle": wallet_last_cycle_operated_blocks,
                 }
             )
 
         except BaseException as E:
-            logger.warning(f"Cannot store stat for wallet '{wallet_address}'@'{node_name}' ({str(E)})")
+            logger.warning(
+                f"Cannot store stat for wallet '{wallet_address}'@'{node_name}' ({str(E)})")
 
         else:
-            logger.info(f"Stored stat for wallet '{wallet_address}'@'{node_name}' ({len(app_globals.app_results[node_name]['wallets'][wallet_address]['stat'])} measures)")
+            logger.info(
+                f"Stored stat for wallet '{wallet_address}'@'{node_name}' ({len(app_globals.app_results[node_name]['wallets'][wallet_address]['stat'])} measures)")
 
     return
-
-
 
 
 if __name__ == "__main__":
