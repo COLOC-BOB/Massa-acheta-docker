@@ -183,6 +183,29 @@ async def get_last_seen(last_time: int=0, show_days: bool=False) -> str:
     return f"{result} ago"
 
 
+@logger.catch
+async def get_duration(start_time: int=0, show_days: bool=False) -> str:
+    logger.debug("-> Enter Def")
+
+    if start_time == 0:
+        return "unknown"
+
+    current_time = await t_now()
+    diff_seconds = current_time - start_time
+
+    if show_days:
+        diff_days = diff_seconds // (24 * 60 * 60)
+        diff_hours = (diff_seconds - (diff_days * 24 * 60 * 60)) // (60 * 60)
+        diff_mins = (diff_seconds - (diff_days * 24 * 60 * 60) - (diff_hours * 60 * 60)) // 60
+        result = f"{diff_days}d {diff_hours}h {diff_mins}m"
+    else:
+        diff_hours = diff_seconds // (60 * 60)
+        diff_mins = (diff_seconds - (diff_hours * 60 * 60)) // 60
+        result = f"{diff_hours}h {diff_mins}m"
+
+    return result
+
+
 
 @logger.catch
 async def get_short_address(address: str="") -> str:

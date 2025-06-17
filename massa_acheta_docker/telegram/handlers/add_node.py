@@ -117,6 +117,7 @@ async def add_node(message: Message, state: FSMContext) -> None:
             app_globals.app_results[node_name]['url'] = node_url
             app_globals.app_results[node_name]['last_status'] = "unknown"
             app_globals.app_results[node_name]['last_update'] = 0
+            app_globals.app_results[node_name]['start_time'] = 0
             app_globals.app_results[node_name]['last_result'] = {"unknown": "Never updated before"}
             app_globals.app_results[node_name]['wallets'] = {}
             save_app_results()
