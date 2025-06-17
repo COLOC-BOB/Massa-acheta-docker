@@ -179,14 +179,24 @@ async def check_wallet(node_name: str = "", wallet_address: str = "") -> None:
                 )
                 await queue_telegram_message(message_text=t.as_html())
 
-            # Comparaison avec la dernière valeur connue
-            previous_blocks = app_globals.app_results[node_name]['wallets'][wallet_address].get(
-                'produced_blocks', 0)
+            # Compare with last stored cycle stats
+            last_cycle = app_globals.app_results[node_name]['wallets'][wallet_address]['last_cycle']
+            last_ok = app_globals.app_results[node_name]['wallets'][wallet_address]['last_ok_count']
+            last_nok = app_globals.app_results[node_name]['wallets'][wallet_address]['last_nok_count']
 
-            if wallet_operated_blocks > previous_blocks:
-                new_blocks = wallet_operated_blocks - previous_blocks
+            current_cycle = wallet_cycle_infos[-1].get("cycle", 0)
+            ok_count = wallet_cycle_infos[-1].get("ok_count", 0)
+            nok_count = wallet_cycle_infos[-1].get("nok_count", 0)
 
-                for _ in range(new_blocks):
+            if current_cycle != last_cycle:
+                new_ok = ok_count
+                new_nok = nok_count
+            else:
+                new_ok = ok_count - last_ok
+                new_nok = nok_count - last_nok
+
+            if new_ok > 0:
+                for _ in range(new_ok):
                     t = as_list(
                         f"🏠 Node: \"{node_name}\"",
                         as_line(
@@ -197,13 +207,11 @@ async def check_wallet(node_name: str = "", wallet_address: str = "") -> None:
                                 await get_short_address(address=wallet_address),
                                 url=f"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}"
                             )
-                        ),
-                        f"📦 Total produits : {previous_blocks:,} → {wallet_operated_blocks:,}"
+                        )
                     )
                     await queue_telegram_message(message_text=t.as_html())
 
-            # 4) Check if new blocks missed:
-            if wallet_missed_blocks > app_globals.app_results[node_name]['wallets'][wallet_address]['missed_blocks']:
+            if new_nok > 0:
                 t = as_list(
                     f"🏠 Node: \"{node_name}\"",
                     as_line(f"📍 {app_globals.app_results[node_name]['url']}"),
@@ -217,6 +225,11 @@ async def check_wallet(node_name: str = "", wallet_address: str = "") -> None:
                     f"👁 Blocks missed in last cycles: {wallet_missed_blocks}"
                 )
                 await queue_telegram_message(message_text=t.as_html())
+
+            # Update last cycle stats for next iteration
+            app_globals.app_results[node_name]['wallets'][wallet_address]['last_cycle'] = current_cycle
+            app_globals.app_results[node_name]['wallets'][wallet_address]['last_ok_count'] = ok_count
+            app_globals.app_results[node_name]['wallets'][wallet_address]['last_nok_count'] = nok_count
 
             time_now = await t_now()
 

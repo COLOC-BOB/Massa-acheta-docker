@@ -77,6 +77,9 @@ for node_name in app_results:
         app_results[node_name]['wallets'][wallet_address]['candidate_rolls'] = 0
         app_results[node_name]['wallets'][wallet_address]['active_rolls'] = 0
         app_results[node_name]['wallets'][wallet_address]['missed_blocks'] = 0
+        app_results[node_name]['wallets'][wallet_address]['last_cycle'] = 0
+        app_results[node_name]['wallets'][wallet_address]['last_ok_count'] = 0
+        app_results[node_name]['wallets'][wallet_address]['last_nok_count'] = 0
         app_results[node_name]['wallets'][wallet_address]['last_result'] = {"unknown": "Never updated before"}
         app_results[node_name]['wallets'][wallet_address]['stat'] = deque(
             maxlen=int(

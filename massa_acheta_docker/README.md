@@ -143,6 +143,8 @@ If the attempt is successful, Acheta will start to watch your wallet and will se
 - Changing the number of candidate rolls
 - Changing the number of active rolls
 
+Block notifications now rely on the counters of the last cycle, ensuring that no produced or missed block is lost even if the API only returns a limited history.
+
 You also can display actual wallet info using command:
 >
 > `/view_wallet`
