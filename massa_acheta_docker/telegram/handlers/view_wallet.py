@@ -247,14 +247,29 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
             credit_list.append("💳 Deferred credits: ")
 
             for wallet_credit in wallet_credits:
-                credit_amount = round(
-                    float(wallet_credit['amount']),
-                    4
-                )
+                credit_period = None
+                credit_unix = None
+                try:
+                    credit_amount = round(
+                        float(wallet_credit.get('amount', 0)),
+                        4
+                    )
 
-                credit_period = int(wallet_credit['slot']['period'])
-                credit_unix = 1705312800 + (credit_period * 16)
-                credit_date = datetime.utcfromtimestamp(credit_unix).strftime("%b %d, %Y")
+                    credit_slot = wallet_credit.get('slot', None)
+                    if credit_slot:
+                        credit_period = credit_slot.get('period', None)
+                        if credit_period is not None:
+                            credit_period = int(credit_period)
+                            credit_unix = 1705312800 + (credit_period * 16)
+                            credit_date = datetime.utcfromtimestamp(credit_unix).strftime("%b %d, %Y")
+
+                except BaseException as E:
+                    logger.warning(f"Cannot compute deferred credit ({str(E)}) for credit '{wallet_credit}'")
+                    continue
+
+                if credit_unix is None:
+                    logger.warning(f"Deferred credit slot period missing for credit '{wallet_credit}'")
+                    continue
 
                 credit_list.append(
                     f" ⋅ {credit_date}: {credit_amount:,} MAS"
