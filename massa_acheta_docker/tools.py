@@ -59,11 +59,15 @@ async def pull_http_api(api_url: str=None,
             if not api_root_element:
                 api_result = {"result": api_response_obj}
             else:
-                api_result = api_response_obj.get(api_root_element, None)
-                if not api_result:
-                    raise Exception(f"A mandatory key '{api_root_element}' missed in remote HTTP API response: {api_response_text}")
+                api_result_value = api_response_obj.get(api_root_element, None)
+                if api_result_value is not None:
+                    api_result = {"result": api_result_value}
+                elif "error" in api_response_obj:
+                    api_result = {"error": api_response_obj["error"]}
                 else:
-                    api_result = {"result": api_result}
+                    raise Exception(
+                        f"A mandatory key '{api_root_element}' missed in remote HTTP API response: {api_response_text}"
+                    )
         else:
             api_result = {"result": api_response_text}
 
