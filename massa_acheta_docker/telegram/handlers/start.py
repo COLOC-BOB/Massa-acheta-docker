@@ -3,7 +3,7 @@ from loguru import logger
 from aiogram import Router
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
-from telegram.menu import build_help_text
+from telegram.menu import build_help_text, build_help_keyboard
 from aiogram.enums import ParseMode
 
 from app_config import app_config
@@ -21,11 +21,13 @@ async def cmd_start(message: Message) -> None:
 
     public = message.chat.id != app_globals.bot.ACHETA_CHAT
     t = build_help_text(public)
+    keyboard = build_help_keyboard(public)
 
     try:
         await message.reply(
             text=t,
             parse_mode=ParseMode.HTML,
+            reply_markup=keyboard,
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except BaseException as E:

@@ -1,4 +1,5 @@
-from aiogram.types import BotCommand
+from aiogram.types import BotCommand, ReplyKeyboardMarkup
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram.utils.formatting import as_list, as_line, TextLink
 
 # Tuples of (command, description) for the private bot mode
@@ -56,3 +57,13 @@ def build_help_text(public: bool) -> str:
         as_line("🎁 Wanna thank the author? ", TextLink("Ask me how", url="https://github.com/dex2code/massa_acheta#thank-you")),
     ])
     return as_list(*lines).as_html()
+
+
+def build_help_keyboard(public: bool) -> ReplyKeyboardMarkup:
+    """Build a reply keyboard with available commands."""
+    commands = PUBLIC_COMMANDS if public else PRIVATE_COMMANDS
+    kb = ReplyKeyboardBuilder()
+    for cmd, _ in commands:
+        kb.button(text=cmd)
+    kb.adjust(2)
+    return kb.as_markup(resize_keyboard=True)

@@ -94,6 +94,8 @@ Before we jump to a detailed description of the service, please watch the video:
 
 ## What can Acheta do:
 
+Use `/help` in Telegram to display a menu with buttons for the available commands.
+
 ### 👉 Explore MASSA blockchain
 First of all it can observe MASSA explorer and display wallets info with command:
 >
