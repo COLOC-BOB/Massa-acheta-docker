@@ -65,6 +65,7 @@ else:
 for node_name in app_results:
     app_results[node_name]['last_status'] = "unknown"
     app_results[node_name]['last_update'] = 0
+    app_results[node_name]['start_time'] = 0
     app_results[node_name]['last_chain_id'] = 0
     app_results[node_name]['last_cycle'] = 0
     app_results[node_name]['last_result'] = {"unknown": "Never updated before"}

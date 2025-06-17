@@ -12,7 +12,7 @@ from app_config import app_config
 import app_globals
 
 from telegram.keyboards.kb_nodes import kb_nodes
-from tools import get_last_seen, get_short_address, check_privacy
+from tools import get_last_seen, get_short_address, check_privacy, get_duration
 
 
 class NodeViewer(StatesGroup):
@@ -99,6 +99,10 @@ async def show_node(message: Message, state: FSMContext) -> None:
     last_seen = await get_last_seen(
         last_time=app_globals.app_results[node_name]['last_update']
     )
+    node_uptime = await get_duration(
+        start_time=app_globals.app_results[node_name].get('start_time', 0),
+        show_days=True
+    )
 
     if app_globals.app_results[node_name]['last_status'] != True:
         node_status = f"☠️ Status: Offline (last seen: {last_seen})"
@@ -115,7 +119,7 @@ async def show_node(message: Message, state: FSMContext) -> None:
             f"☝ Service checks updates: every {app_config['service']['main_loop_period_min']} minutes"
         )
     else:
-        node_status = f"🌿 Status: Online (last seen: {last_seen})"
+        node_status = f"🌿 Status: Online (uptime {node_uptime})"
 
         node_id = app_globals.app_results[node_name]['last_result'].get("node_id", "Not known")
         node_ip = app_globals.app_results[node_name]['last_result'].get("node_ip", "Not known")

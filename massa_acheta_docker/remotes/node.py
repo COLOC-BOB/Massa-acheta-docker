@@ -36,10 +36,20 @@ async def check_node(node_name: str="") -> None:
         node_chain_id = node_result.get("chain_id", None)
         if not node_chain_id:
             raise Exception(f"No 'chain_id' in MASSA node API answer")
-        
+
         node_current_cycle = node_result.get("current_cycle", None)
         if not node_current_cycle:
             raise Exception(f"No 'current_cycle' in MASSA node API answer")
+
+        # read node start time if provided
+        node_start_time = node_result.get("start_time", None)
+        if not node_start_time:
+            node_start_time = node_result.get("node_start_time", 0)
+        try:
+            if node_start_time:
+                node_start_time = int(float(node_start_time))
+        except Exception:
+            node_start_time = 0
 
     except BaseException as E:
         logger.warning(f"Node '{node_name}' ({app_globals.app_results[node_name]['url']}) seems dead! ({str(E)})")
@@ -89,6 +99,8 @@ async def check_node(node_name: str="") -> None:
         app_globals.app_results[node_name]['last_chain_id'] = node_chain_id
         app_globals.app_results[node_name]['last_cycle'] = node_current_cycle
         app_globals.app_results[node_name]['last_result'] = node_result
+        if node_start_time:
+            app_globals.app_results[node_name]['start_time'] = node_start_time
     
     return
 

@@ -7,7 +7,7 @@ from app_config import app_config
 import app_globals
 
 from telegram.queue import queue_telegram_message
-from tools import get_last_seen, get_short_address, get_rewards_mas_day, save_public_dir
+from tools import get_last_seen, get_short_address, get_rewards_mas_day, save_public_dir, get_duration
 
 
 async def heartbeat() -> None:
@@ -43,9 +43,13 @@ async def heartbeat() -> None:
                     last_seen = await get_last_seen(
                         last_time=app_globals.app_results[node_name]['last_update']
                     )
+                    node_uptime = await get_duration(
+                        start_time=app_globals.app_results[node_name].get('start_time', 0),
+                        show_days=True
+                    )
 
                     if app_globals.app_results[node_name]['last_status'] == True:
-                        heartbeat_list.append(f"🌿 Status: Online ({last_seen})")
+                        heartbeat_list.append(f"🌿 Status: Online (uptime {node_uptime})")
 
                         num_wallets = len(app_globals.app_results[node_name]['wallets'])
                         if num_wallets == 0:
