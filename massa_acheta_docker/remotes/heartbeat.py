@@ -58,6 +58,10 @@ async def heartbeat() -> None:
                             for wallet_address in app_globals.app_results[node_name]['wallets']:
 
                                 if app_globals.app_results[node_name]['wallets'][wallet_address]['last_status'] == True:
+                                    balance = app_globals.app_results[node_name]['wallets'][wallet_address]['final_balance']
+                                    produced_blocks = app_globals.app_results[node_name]['wallets'][wallet_address]['produced_blocks']
+                                    last_cycle = app_globals.app_results[node_name]['wallets'][wallet_address]['last_cycle']
+
                                     wallet_list.append(
                                         as_line(
                                             "⦙\n",
@@ -66,7 +70,7 @@ async def heartbeat() -> None:
                                                 await get_short_address(address=wallet_address),
                                                 url=f"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}"
                                             ),
-                                            f" ( {app_globals.app_results[node_name]['wallets'][wallet_address]['final_balance']:,} MAS )",
+                                            f" ( {balance:,} MAS | {produced_blocks} OK | cycle {last_cycle} )",
                                             end=""
                                         )
                                     )
@@ -79,7 +83,7 @@ async def heartbeat() -> None:
                                                 await get_short_address(address=wallet_address),
                                                 url=f"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}"
                                             ),
-                                            " ( ? MAS )",
+                                            " ( ? MAS | ? OK | cycle ? )",
                                             end=""
                                         )
                                     )
