@@ -12,7 +12,7 @@ logger.add(
 
 import asyncio
 from aiogram.utils.formatting import as_list
-from aiogram.types import BotCommand
+from telegram.menu import get_bot_commands
 from pathlib import Path
 from sys import exit as sys_exit
 
@@ -42,43 +42,13 @@ async def main() -> None:
     logger.debug(f"-> Enter Def")
 
     public_obj = Path("public")
-    if not public_obj.exists():
+    public = public_obj.exists()
+    if not public:
         logger.info(f"No file '{public_obj}' exists. Private menu applied.")
-        bot_commands = [
-            BotCommand(command="/help", description="Show help info"),
-            BotCommand(command="/view_config", description="View service config"),
-            BotCommand(command="/view_node", description="View node status"),
-            BotCommand(command="/view_wallet", description="View wallet info"),
-            BotCommand(command="/chart_wallet", description="View wallet chart"),
-            BotCommand(command="/view_address", description="View any wallet info"),
-            BotCommand(command="/clean_address", description="Clean remembered address"),
-            BotCommand(command="/view_credits", description="View any wallet credits"),
-            BotCommand(command="/view_earnings", description="View rewards for staking"),
-            BotCommand(command="/add_node", description="Add node to bot"),
-            BotCommand(command="/add_wallet", description="Add wallet to bot"),
-            BotCommand(command="/delete_node", description="Delete node from bot"),
-            BotCommand(command="/delete_wallet", description="Delete wallet from bot"),
-            BotCommand(command="/massa_info", description="Show MASSA network info"),
-            BotCommand(command="/massa_chart", description="Show MASSA network chart"),
-            BotCommand(command="/acheta_release", description="Actual Acheta release"),
-            BotCommand(command="/view_id", description="Show your TG ID"),
-            BotCommand(command="/cancel", description="Cancel ongoing scenario"),
-            BotCommand(command="/reset", description="Reset bot configuration")
-        ]
-
     else:
         logger.info(f"File '{public_obj}' exists. Public menu applied.")
-        bot_commands = [
-            BotCommand(command="/help", description="Show help info"),
-            BotCommand(command="/view_address", description="View any wallet info"),
-            BotCommand(command="/clean_address", description="Clean remembered address"),
-            BotCommand(command="/view_credits", description="View any wallet credits"),
-            BotCommand(command="/view_earnings", description="View rewards for staking"),
-            BotCommand(command="/massa_info", description="Show MASSA network info"),
-            BotCommand(command="/massa_chart", description="Show MASSA network chart"),
-            BotCommand(command="/view_id", description="Show your TG ID"),
-            BotCommand(command="/cancel", description="Cancel ongoing scenario")
-        ]
+
+    bot_commands = get_bot_commands(public)
 
     await app_globals.tg_bot.set_my_commands(bot_commands)
 
