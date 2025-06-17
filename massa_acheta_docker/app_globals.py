@@ -62,31 +62,32 @@ else:
     else:
         logger.info(f"Successfully created empty '{app_results_obj}' file")
 
-for node_name in app_results:
-    app_results[node_name]['last_status'] = "unknown"
-    app_results[node_name]['last_update'] = 0
-    app_results[node_name]['start_time'] = 0
-    app_results[node_name]['last_chain_id'] = 0
-    app_results[node_name]['last_cycle'] = 0
-    app_results[node_name]['last_result'] = {"unknown": "Never updated before"}
+for node_name, node_data in app_results.items():
+    node_data.setdefault('last_status', "unknown")
+    node_data.setdefault('last_update', 0)
+    node_data.setdefault('start_time', 0)
+    node_data.setdefault('last_chain_id', 0)
+    node_data.setdefault('last_cycle', 0)
+    node_data.setdefault('last_result', {"unknown": "Never updated before"})
 
-    for wallet_address in app_results[node_name]['wallets']:
-        app_results[node_name]['wallets'][wallet_address] = {}
-        app_results[node_name]['wallets'][wallet_address]['last_status'] = "unknown"
-        app_results[node_name]['wallets'][wallet_address]['last_update'] = 0
-        app_results[node_name]['wallets'][wallet_address]['final_balance'] = 0
-        app_results[node_name]['wallets'][wallet_address]['candidate_rolls'] = 0
-        app_results[node_name]['wallets'][wallet_address]['active_rolls'] = 0
-        app_results[node_name]['wallets'][wallet_address]['missed_blocks'] = 0
-        app_results[node_name]['wallets'][wallet_address]['last_cycle'] = 0
-        app_results[node_name]['wallets'][wallet_address]['last_ok_count'] = 0
-        app_results[node_name]['wallets'][wallet_address]['last_nok_count'] = 0
-        app_results[node_name]['wallets'][wallet_address]['last_result'] = {"unknown": "Never updated before"}
-        app_results[node_name]['wallets'][wallet_address]['stat'] = deque(
-            maxlen=int(
-                24 * 60 / app_config['service']['main_loop_period_min']
+    for wallet_address, wallet_data in node_data.get('wallets', {}).items():
+        node_data['wallets'][wallet_address].setdefault('last_status', "unknown")
+        node_data['wallets'][wallet_address].setdefault('last_update', 0)
+        node_data['wallets'][wallet_address].setdefault('final_balance', 0)
+        node_data['wallets'][wallet_address].setdefault('candidate_rolls', 0)
+        node_data['wallets'][wallet_address].setdefault('active_rolls', 0)
+        node_data['wallets'][wallet_address].setdefault('missed_blocks', 0)
+        node_data['wallets'][wallet_address].setdefault('last_cycle', 0)
+        node_data['wallets'][wallet_address].setdefault('last_ok_count', 0)
+        node_data['wallets'][wallet_address].setdefault('last_nok_count', 0)
+        node_data['wallets'][wallet_address].setdefault('produced_blocks', 0)
+        node_data['wallets'][wallet_address].setdefault('last_result', {"unknown": "Never updated before"})
+        if 'stat' not in node_data['wallets'][wallet_address] or not isinstance(node_data['wallets'][wallet_address]['stat'], deque):
+            node_data['wallets'][wallet_address]['stat'] = deque(
+                maxlen=int(
+                    24 * 60 / app_config['service']['main_loop_period_min']
+                )
             )
-        )
 
 
 
