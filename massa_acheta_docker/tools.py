@@ -86,13 +86,40 @@ def save_app_results() -> bool:
     composed_results = {}
 
     try:
-        for node_name in app_globals.app_results:
+        for node_name, node_data in app_globals.app_results.items():
             composed_results[node_name] = {}
-            composed_results[node_name]['url'] = app_globals.app_results[node_name]['url']
-            composed_results[node_name]['wallets'] = {}
+            # Save node static and dynamic fields (except stats)
+            for field in [
+                "url",
+                "last_status",
+                "last_update",
+                "start_time",
+                "last_chain_id",
+                "last_cycle",
+                "last_result",
+            ]:
+                composed_results[node_name][field] = node_data.get(field, None)
 
-            for wallet_address in app_globals.app_results[node_name]['wallets']:
-                composed_results[node_name]['wallets'][wallet_address] = {}
+            composed_results[node_name]["wallets"] = {}
+
+            for wallet_address, wallet_data in node_data.get("wallets", {}).items():
+                composed_results[node_name]["wallets"][wallet_address] = {}
+                for w_field in [
+                    "last_status",
+                    "last_update",
+                    "final_balance",
+                    "candidate_rolls",
+                    "active_rolls",
+                    "missed_blocks",
+                    "last_cycle",
+                    "last_ok_count",
+                    "last_nok_count",
+                    "produced_blocks",
+                    "last_result",
+                ]:
+                    composed_results[node_name]["wallets"][wallet_address][w_field] = wallet_data.get(
+                        w_field, None
+                    )
 
         app_results_obj = Path(app_config['service']['results_path'])
         with open(file=app_results_obj, mode="wt") as output_results:
