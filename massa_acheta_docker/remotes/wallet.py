@@ -196,18 +196,71 @@ async def check_wallet(node_name: str = "", wallet_address: str = "") -> None:
                 new_nok = nok_count - last_nok
 
             if new_ok > 0:
-                for _ in range(new_ok):
-                    t = as_list(
-                        f"🏠 Node: \"{node_name}\"",
-                        as_line(
-                            f"📍 {app_globals.app_results[node_name]['url']}"),
-                        as_line(
+                # Try to get block identifiers for the newly produced blocks
+                block_ids: list[str] = []
+                try:
+                    payload_blocks = json.dumps(
+                        {
+                            "id": 0,
+                            "jsonrpc": "2.0",
+                            "method": "get_blocks",
+                            "params": [
+                                {
+                                    "creator": wallet_address,
+                                    "limit": new_ok
+                                }
+                            ]
+                        }
+                    )
+
+                    blocks_answer = await pull_http_api(
+                        api_url=app_globals.app_results[node_name]['url'],
+                        api_method="POST",
+                        api_payload=payload_blocks,
+                        api_root_element="result"
+                    )
+
+                    blocks_result = blocks_answer.get("result", None)
+                    if blocks_result and isinstance(blocks_result, list):
+                        for block in blocks_result:
+                            block_id = block.get("id", None)
+                            if block_id:
+                                block_ids.append(block_id)
+                except BaseException as E:
+                    logger.warning(
+                        f"Cannot get produced block ids for '{wallet_address}'@'{node_name}': ({str(E)})")
+
+                for idx in range(new_ok):
+                    block_id = block_ids[idx] if idx < len(block_ids) else ""
+
+                    if block_id:
+                        block_link = TextLink(
+                            block_id,
+                            url=f"{app_config['service']['mainnet_explorer_url']}/block/{block_id}"
+                        )
+                        line = as_line(
+                            "✅ Nouveau bloc ",
+                            block_link,
+                            " produit par : ",
+                            TextLink(
+                                await get_short_address(address=wallet_address),
+                                url=f"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}"
+                            )
+                        )
+                    else:
+                        line = as_line(
                             "✅ Nouveau bloc produit par : ",
                             TextLink(
                                 await get_short_address(address=wallet_address),
                                 url=f"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}"
                             )
                         )
+
+                    t = as_list(
+                        f"🏠 Node: \"{node_name}\"",
+                        as_line(
+                            f"📍 {app_globals.app_results[node_name]['url']}"),
+                        line
                     )
                     await queue_telegram_message(message_text=t.as_html())
 
