@@ -58,6 +58,8 @@ async def get_credits(wallet_address: str="") -> Text:
     now_unix = int(await t_now())
 
     for wallet_credit in wallet_credits:
+        credit_period = None
+        credit_unix = None
         try:
             credit_amount = wallet_credit.get("amount", 0)
             credit_amount = float(credit_amount)
@@ -66,36 +68,40 @@ async def get_credits(wallet_address: str="") -> Text:
             credit_slot = wallet_credit.get("slot", None)
             if credit_slot:
                 credit_period = credit_slot.get("period", None)
-                credit_period = int(credit_period)
-            
-            if credit_period:
-                credit_unix = 1705312800 + (credit_period * 16)
-                credit_date = datetime.utcfromtimestamp(credit_unix).strftime("%b %d, %Y")
+                if credit_period is not None:
+                    credit_period = int(credit_period)
+                    credit_unix = 1705312800 + (credit_period * 16)
+                    credit_date = datetime.utcfromtimestamp(credit_unix).strftime("%b %d, %Y")
 
         except BaseException as E:
             logger.warning(f"Cannot compute deferred credit ({str(E)}) for credit '{wallet_credit}'")
-        
+            continue
+
+        if credit_unix is None:
+            logger.warning(f"Deferred credit slot period missing for credit '{wallet_credit}'")
+            continue
+
+        if credit_unix < now_unix:
+            deferred_credits.append(
+                as_line(
+                    " ⦙\n",
+                    " ⦙… ",
+                    Strikethrough(
+                        f"{credit_date}: {credit_amount:,} MAS"
+                    ),
+                    end="",
+                )
+            )
         else:
-            if credit_unix < now_unix:
-                deferred_credits.append(
-                    as_line(
-                        " ⦙\n",
-                        " ⦙… ",
-                        Strikethrough(
-                            f"{credit_date}: {credit_amount:,} MAS"
-                        ),
-                        end=""
-                    )
+            deferred_credits.append(
+                as_line(
+                    " ⦙\n",
+                    " ⦙… ",
+                    f"{credit_date}: {credit_amount:,} MAS",
+                    end="",
                 )
-            else:
-                deferred_credits.append(
-                    as_line(
-                        " ⦙\n",
-                        " ⦙… ",
-                        f"{credit_date}: {credit_amount:,} MAS",
-                        end=""
-                    )
-                )
+            )
+
 
     return (True,
             as_list(
