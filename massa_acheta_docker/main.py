@@ -65,8 +65,10 @@ async def main() -> None:
 
     t = as_list(
         "🔆 Service successfully started to watch the following nodes:",
-        *nodes_list, "",
-        "👉 Try /help to learn bot commands", "",
+        *nodes_list,
+        "",
+        "👉 Use the command menu to learn bot commands",
+        "",
         f"⏳ Main loop period: {app_config['service']['main_loop_period_min']} minutes",
         f"⚡ Probe timeout: {app_config['service']['http_probe_timeout_sec']} seconds"
     )

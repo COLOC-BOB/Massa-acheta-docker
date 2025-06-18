@@ -43,10 +43,10 @@ def get_bot_commands(public: bool) -> list[BotCommand]:
     commands = PUBLIC_COMMANDS if public else PRIVATE_COMMANDS
     return [BotCommand(command=cmd, description=desc) for cmd, desc in commands]
 
-def build_help_text(public: bool) -> str:
-    """Build help message text in HTML format."""
+def build_menu_text(public: bool) -> str:
+    """Build command menu text in HTML format."""
     commands = PUBLIC_COMMANDS if public else PRIVATE_COMMANDS
-    lines: list[str | object] = ["📖 Commands:", "⦙", "⦙… /start or /help : Show help info", "⦙"]
+    lines: list[str | object] = ["📖 Commands:", "⦙", "⦙… /start : Show command menu", "⦙"]
     for cmd, desc in commands:
         if cmd == "/help":
             continue
@@ -59,7 +59,7 @@ def build_help_text(public: bool) -> str:
     return as_list(*lines).as_html()
 
 
-def build_help_keyboard(public: bool) -> ReplyKeyboardMarkup:
+def build_menu_keyboard(public: bool) -> ReplyKeyboardMarkup:
     """Build a reply keyboard with available commands."""
     commands = PUBLIC_COMMANDS if public else PRIVATE_COMMANDS
     kb = ReplyKeyboardBuilder()

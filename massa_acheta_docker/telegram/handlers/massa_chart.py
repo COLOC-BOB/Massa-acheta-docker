@@ -160,7 +160,7 @@ async def cmd_massa_chart(message: Message) -> None:
         logger.error(f"Cannot prepare MASSA Mainnet chart ({str(E)})")
         t = as_list(
             as_line("🤷 Charts are temporary unavailable. Try later."),
-            as_line("☝ Use /help to learn bot commands")
+            as_line("☝ Use the command menu to learn bot commands")
         )
         try:
             await message.reply(

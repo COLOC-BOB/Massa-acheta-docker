@@ -59,8 +59,9 @@ async def input_nodename_to_add(message: Message, state: FSMContext) -> None:
 
     if node_name in app_globals.app_results:
         t = as_list(
-            f"‼ Error: Node with nickname \"{node_name}\" already exists", "",
-            "👉 Try /add_node to add another node or /help to learn bot commands"
+            f"‼ Error: Node with nickname \"{node_name}\" already exists",
+            "",
+            "👉 Try /add_node to add another node or use the command menu for help"
         )
         try:
             await message.reply(

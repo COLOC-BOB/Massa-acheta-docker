@@ -60,8 +60,9 @@ async def do_reset(message: Message, state: FSMContext) -> None:
 
     if message.text.upper() != "I REALLY WANT TO RESET ALL SETTINGS":
         t = as_list(
-            "🤚 Reset request rejected", "",
-            "👉 Try /help to learn bot commands"
+            "🤚 Reset request rejected",
+            "",
+            "👉 Use the command menu to learn bot commands"
         )
         try:
             await message.reply(
