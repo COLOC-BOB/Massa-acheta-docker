@@ -34,7 +34,7 @@ from telegram.handlers import massa_info, massa_chart, acheta_release
 from telegram.handlers import reset
 from telegram.handlers import unknown
 
-from tools import save_app_stat, save_public_dir, save_app_results
+from tools import save_app_stat, save_app_results
 
 
 @logger.catch
@@ -133,7 +133,6 @@ if __name__ == "__main__":
     finally:
         save_app_results()
         save_app_stat()
-        save_public_dir()
 
         logger.critical("Service terminated")
         sys_exit()

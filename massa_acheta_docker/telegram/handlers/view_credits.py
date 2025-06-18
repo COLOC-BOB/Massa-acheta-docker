@@ -12,7 +12,7 @@ from aiogram.enums import ParseMode
 from app_config import app_config
 import app_globals
 
-from tools import get_short_address, t_now, get_public_dir, add_public_dir
+from tools import get_short_address, t_now
 
 
 class CreditsViewer(StatesGroup):
@@ -134,25 +134,17 @@ async def cmd_view_credits(message: Message, state: FSMContext) -> None:
     message_list = message.text.split()
     if len(message_list) < 2:
 
-        public_wallet_address = await get_public_dir(chat_id=message.chat.id)
-        if public_wallet_address:
-            _, t = await get_credits(wallet_address=public_wallet_address)
-
-        else:
-            t = as_list(
-                "❓ Please answer with a wallet address you want to explore: ", "",
-                as_line(
-                    "☝ The wallet address must start with ",
-                    Underline("AU"),
-                    " prefix"
-                ),
-                "👉 Use /cancel to quit the scenario"
-            )
-
+        t = as_list(
+            "❓ Please answer with a wallet address you want to explore: ", "",
+            as_line(
+                "☝ The wallet address must start with ",
+                Underline("AU"),
+                " prefix"
+            ),
+            "👉 Use /cancel to quit the scenario",
+        )
+        await state.set_state(CreditsViewer.waiting_wallet_address)
         try:
-            if not public_wallet_address:
-                await state.set_state(CreditsViewer.waiting_wallet_address)
-
             await message.reply(
                 text=t.as_html(),
                 parse_mode=ParseMode.HTML,
@@ -161,7 +153,6 @@ async def cmd_view_credits(message: Message, state: FSMContext) -> None:
         except BaseException as E:
             logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
             await state.clear()
-
         return
 
     wallet_address = message_list[1]
@@ -175,10 +166,6 @@ async def cmd_view_credits(message: Message, state: FSMContext) -> None:
 
     except BaseException as E:
         logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
-
-    else:
-        if r:
-            await add_public_dir(chat_id=message.chat.id, wallet_address=wallet_address)
 
     await state.clear()
     return
@@ -208,10 +195,6 @@ async def show_credits(message: Message, state: FSMContext) -> None:
 
     except BaseException as E:
         logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
-
-    else:
-        if r:
-            await add_public_dir(chat_id=message.chat.id, wallet_address=wallet_address)
 
     await state.clear()
     return

@@ -12,7 +12,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 from app_config import app_config
 
-from tools import pull_http_api, get_short_address, get_rewards_mas_day, add_public_dir, get_public_dir
+from tools import pull_http_api, get_short_address, get_rewards_mas_day
 
 
 class AddressViewer(StatesGroup):
@@ -200,37 +200,27 @@ async def cmd_view_address(message: Message, state: FSMContext) -> None:
 
     message_list = message.text.split()
     if len(message_list) < 2:
-
-        public_wallet_address = await get_public_dir(chat_id=message.chat.id)
-        if public_wallet_address:
-            _, t = await get_address(wallet_address=public_wallet_address)
-
-        else:
-            t = as_list(
-                "❓ Please answer with a wallet address you want to explore: ", "",
-                as_line(
-                    "☝ The wallet address must start with ",
-                    Underline("AU"),
-                    " prefix"
-                ),
-                "👉 Use /cancel to quit the scenario"
-            )
-
+        t = as_list(
+            "❓ Please answer with a wallet address you want to explore: ", "",
+            as_line(
+                "☝ The wallet address must start with ",
+                Underline("AU"),
+                " prefix"
+            ),
+            "👉 Use /cancel to quit the scenario",
+        )
+        await state.set_state(AddressViewer.waiting_wallet_address)
         try:
-            if not public_wallet_address:
-                await state.set_state(AddressViewer.waiting_wallet_address)
-
             await message.reply(
                 text=t.as_html(),
                 parse_mode=ParseMode.HTML,
-                request_timeout=app_config['telegram']['sending_timeout_sec']
+                request_timeout=app_config["telegram"]["sending_timeout_sec"]
             )
-
         except BaseException as E:
             logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
             await state.clear()
-
         return
+
 
     wallet_address = message_list[1]
     r, t = await get_address(wallet_address=wallet_address)
@@ -245,9 +235,6 @@ async def cmd_view_address(message: Message, state: FSMContext) -> None:
         logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
         await state.clear()
 
-    else:
-        if r:
-            await add_public_dir(chat_id=message.chat.id, wallet_address=wallet_address)
 
     return
 
@@ -277,10 +264,6 @@ async def show_address(message: Message, state: FSMContext) -> None:
     except BaseException as E:
         logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
     
-    else:
-        if r:
-            await add_public_dir(chat_id=message.chat.id, wallet_address=wallet_address)
-
     await state.clear()
     return
 
@@ -304,9 +287,5 @@ async def cmd_default(message: Message) -> None:
 
     except BaseException as E:
         logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
-
-    else:
-        if r:
-            await add_public_dir(chat_id=message.chat.id, wallet_address=wallet_address)
 
     return
