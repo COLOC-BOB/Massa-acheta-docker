@@ -34,8 +34,9 @@ async def cmd_add_wallet(message: Message, state: FSMContext) -> None:
     
     if len(app_globals.app_results) == 0:
         t = as_list(
-            "⭕ Node list is empty", "",
-            "👉 Try /add_node to add a node or /help to learn bot commands"
+            "⭕ Node list is empty",
+            "",
+            "👉 Try /add_node to add a node or use the command menu for help"
         )
         try:
             await message.reply(
@@ -79,8 +80,9 @@ async def input_wallet_to_add(message: Message, state: FSMContext) -> None:
     node_name = message.text
     if node_name not in app_globals.app_results:
         t = as_list(
-            f"‼ Error: Unknown node \"{node_name}\"", "",
-            "👉 Try /add_wallet to add another wallet or /help to learn bot commands"
+            f"‼ Error: Unknown node \"{node_name}\"",
+            "",
+            "👉 Try /add_wallet to add another wallet or use the command menu for help"
         )
         try:
             await message.reply(
@@ -145,7 +147,7 @@ async def add_wallet(message: Message, state: FSMContext) -> None:
                 ),
                 f" already attached to node \"{node_name}\""
             ),
-            "👉 Try /add_wallet to add another wallet or /help to learn bot commands"
+            "👉 Try /add_wallet to add another wallet or use the command menu for help"
         )
         try:
             await message.reply(

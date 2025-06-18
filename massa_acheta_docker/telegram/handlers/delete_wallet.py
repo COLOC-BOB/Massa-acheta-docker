@@ -32,8 +32,9 @@ async def cmd_delete_wallet(message: Message, state: FSMContext) -> None:
     
     if len(app_globals.app_results) == 0:
         t = as_list(
-            "⭕ Node list is empty", "",
-            "👉 Try /help to learn how to add a node to bot"
+            "⭕ Node list is empty",
+            "",
+            "👉 Use the command menu to learn how to add a node to bot"
         )
         try:
             await message.reply(
@@ -77,8 +78,9 @@ async def select_wallet_to_delete(message: Message, state: FSMContext) -> None:
     node_name = message.text
     if node_name not in app_globals.app_results:
         t = as_list(
-            f"‼ Error: Unknown node \"{node_name}\"", "",
-            "👉 Try /delete_wallet to delete another wallet or /help to learn bot commands"
+            f"‼ Error: Unknown node \"{node_name}\"",
+            "",
+            "👉 Try /delete_wallet to delete another wallet or use the command menu for help"
         )
         try:
             await message.reply(
@@ -95,8 +97,9 @@ async def select_wallet_to_delete(message: Message, state: FSMContext) -> None:
 
     if len(app_globals.app_results[node_name]['wallets']) == 0:
         t = as_list(
-            f"⭕ No wallets attached to node \"{node_name}\"", "",
-            "👉 Try /add_wallet to add a wallet or /help to learn bot commands"
+            f"⭕ No wallets attached to node \"{node_name}\"",
+            "",
+            "👉 Try /add_wallet to add a wallet or use the command menu for help"
         )
         try:
             await message.reply(
@@ -157,7 +160,7 @@ async def delete_wallet(message: Message, state: FSMContext) -> None:
                 ),
                 f" is not attached to node {node_name}"
             ),
-            "👉 Try /delete_wallet to delete another wallet or /help to learn bot commands"
+            "👉 Try /delete_wallet to delete another wallet or use the command menu for help"
         )
         try:
             await message.reply(

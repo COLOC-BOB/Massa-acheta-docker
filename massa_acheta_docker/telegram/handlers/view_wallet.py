@@ -33,8 +33,9 @@ async def cmd_view_wallet(message: Message, state: FSMContext) -> None:
     
     if len(app_globals.app_results) == 0:
         t = as_list(
-            "⭕ Node list is empty", "",
-            "👉 Try /help to learn how to add a node to bot"
+            "⭕ Node list is empty",
+            "",
+            "👉 Use the command menu to learn how to add a node to bot"
         )
         try:
             await message.reply(
@@ -78,8 +79,9 @@ async def select_wallet_to_show(message: Message, state: FSMContext) -> None:
     node_name = message.text
     if node_name not in app_globals.app_results:
         t = as_list(
-            f"‼ Error: Unknown node \"{node_name}\"", "",
-            "👉 Try /view_wallet to view another wallet or /help to learn bot commands"
+            f"‼ Error: Unknown node \"{node_name}\"",
+            "",
+            "👉 Try /view_wallet to view another wallet or use the command menu for help"
         )
         try:
             await message.reply(
@@ -96,8 +98,9 @@ async def select_wallet_to_show(message: Message, state: FSMContext) -> None:
 
     if len(app_globals.app_results[node_name]['wallets']) == 0:
         t = as_list(
-            f"⭕ No wallets attached to node {node_name}", "",
-            "👉 Try /add_wallet to add wallet to the node or /help to learn bot commands"
+            f"⭕ No wallets attached to node {node_name}",
+            "",
+            "👉 Try /add_wallet to add wallet to the node or use the command menu for help"
         )
         try:
             await message.reply(
@@ -158,7 +161,7 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
                 ),
                 f" is not attached to node \"{node_name}\""
             ),
-            "👉 Try /view_wallet to view another wallet or /help to learn bot commands"
+            "👉 Try /view_wallet to view another wallet or use the command menu for help"
         )
         try:
             await message.reply(

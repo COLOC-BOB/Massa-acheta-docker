@@ -31,8 +31,9 @@ async def cmd_delete_node(message: Message, state: FSMContext) -> None:
     
     if len(app_globals.app_results) == 0:
         t = as_list(
-            "⭕ Node list is empty", "",
-            "👉 Try /help to learn how to add a node to bot"
+            "⭕ Node list is empty",
+            "",
+            "👉 Use the command menu to learn how to add a node to bot"
         )
         try:
             await message.reply(
@@ -77,8 +78,9 @@ async def delete_node(message: Message, state: FSMContext) -> None:
 
     if node_name not in app_globals.app_results:
         t = as_list(
-            f"‼ Error: Unknown node \"{node_name}\"", "",
-            as_line("👉 Try /delete_node to delete another node or /help to learn bot commands")
+            f"‼ Error: Unknown node \"{node_name}\"",
+            "",
+            as_line("👉 Try /delete_node to delete another node or use the command menu for help")
         )
         try:
             await message.reply(

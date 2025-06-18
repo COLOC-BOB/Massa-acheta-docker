@@ -267,7 +267,7 @@ async def check_privacy(message: Message) -> bool:
                     url="https://github.com/dex2code/massa_acheta"
                 )
             ),
-            "☝ Try /help to get a list of public commands"
+            "☝ Use the command menu to see available public commands"
         )
         await message.answer(
             text=t.as_html(),
