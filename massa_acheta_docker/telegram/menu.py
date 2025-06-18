@@ -66,4 +66,4 @@ def build_menu_keyboard(public: bool) -> ReplyKeyboardMarkup:
     for cmd, _ in commands:
         kb.button(text=cmd)
     kb.adjust(2)
-    return kb.as_markup(resize_keyboard=True)
+    return kb.as_markup(resize_keyboard=True, is_persistent=True)

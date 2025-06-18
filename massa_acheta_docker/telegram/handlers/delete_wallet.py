@@ -1,7 +1,8 @@
 from loguru import logger
 
 from aiogram import Router, F
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message
+from telegram.menu import build_menu_keyboard
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -86,7 +87,7 @@ async def select_wallet_to_delete(message: Message, state: FSMContext) -> None:
             await message.reply(
                 text=t.as_html(),
                 parse_mode=ParseMode.HTML,
-                reply_markup=ReplyKeyboardRemove(),
+                reply_markup=build_menu_keyboard(message.chat.id != app_globals.bot.ACHETA_CHAT),
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except BaseException as E:
@@ -105,7 +106,7 @@ async def select_wallet_to_delete(message: Message, state: FSMContext) -> None:
             await message.reply(
                 text=t.as_html(),
                 parse_mode=ParseMode.HTML,
-                reply_markup=ReplyKeyboardRemove(),
+                reply_markup=build_menu_keyboard(message.chat.id != app_globals.bot.ACHETA_CHAT),
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except BaseException as E:
@@ -166,7 +167,7 @@ async def delete_wallet(message: Message, state: FSMContext) -> None:
             await message.reply(
                 text=t.as_html(),
                 parse_mode=ParseMode.HTML,
-                reply_markup=ReplyKeyboardRemove(),
+                reply_markup=build_menu_keyboard(message.chat.id != app_globals.bot.ACHETA_CHAT),
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except BaseException as E:
@@ -226,7 +227,7 @@ async def delete_wallet(message: Message, state: FSMContext) -> None:
         await message.reply(
             text=t.as_html(),
             parse_mode=ParseMode.HTML,
-            reply_markup=ReplyKeyboardRemove(),
+            reply_markup=build_menu_keyboard(message.chat.id != app_globals.bot.ACHETA_CHAT),
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except BaseException as E:
