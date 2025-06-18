@@ -17,13 +17,9 @@ You can deploy MASSA Acheta easily using Docker for a reproducible, isolated set
 
 2. **Create your environment file (`.env`) at the project root:**
 
->
 > !! Please check if you have a **Telegram Bot API KEY** and you do know your own **Telegram ID** before start installation
->
 > How to create a new Telegam Bot and its API KEY: https://www.youtube.com/watch?v=UQrcOj63S2o
->
 > You can get your own Telegram ID here: https://t.me/getmyid_bot
->
 
    ```
    echo "ACHETA_KEY=YOUR_TELEGRAM_BOT_TOKEN" > .env
@@ -34,23 +30,13 @@ You can deploy MASSA Acheta easily using Docker for a reproducible, isolated set
 3. **Create required empty files at the root:**
 
 > **app_results.json:**
->
 > Stores the list of monitored nodes and wallets, their current state, configuration (URL, alias), and wallet tracking per node. It acts as the > main backup of user configuration (mapping: node <-> wallets <-> status).
 
->
 > **app_stat.json:**
->
 > Contains detailed history and statistics about nodes and wallets, used to restore historical data after a restart (per-period statistics,
 > previous states, and charts displayed in the Telegram interface).
 
->
-> **public_dir.json:**
->
-> Stores “public” users for multi-user or shared (optional) setups. Used to distinguish public access/settings from the private version.
-
->
 > **deferred_credits.json:**
->
 > Holds deferred credits for each wallet (e.g. upcoming rewards, scheduled payments, etc.). Used to display future credits for a wallet with
 > the /view_credits Telegram command.
 
@@ -83,9 +69,7 @@ docker compose down
 "MASSA Acheta" is a service that will notify you about events occurring on your MASSA node and your wallet.\
 Just like a little cricket!
 
->
 >First of all let's define that this is not a public Telegram Bot, but opensource software that you can install on your own server to get a personal Bot that will be accessible only to you.
->
 
 Before we jump to a detailed description of the service, please watch the video:
 
@@ -98,9 +82,7 @@ Use `/help` in Telegram to display a menu with buttons for the available command
 
 ### 👉 Explore MASSA blockchain
 First of all it can observe MASSA explorer and display wallets info with command:
->
 > `/view_address`
->
 ![view_address](https://github.com/dex2code/massa_acheta/blob/main/img/view_address.png?raw=true)
 
 ### 👉 Watch your node
@@ -108,9 +90,7 @@ First of all it can observe MASSA explorer and display wallets info with command
 
 
 In order to watch your node, you need to add it to the service configuration. To do this use the command:
->
 > `/add_node`
->
 Acheta will ask you for a node nickname (any unique value) and API URL to connect the node using MASSA public API.\
 Use `http://127.0.0.1:33035/api/v2` if you installed Acheta on the same host with MASSA node, otherwise replace `127.0.0.1` with your real MASSA node IP address.
 
@@ -126,16 +106,12 @@ If the node is available, Acheta will start monitoring the node and will notify 
 Every time the status changes, you will receive warning messages about it.
 Moreover, Acheta will notify you if your node becomes out of sync with the MASSA blockchain.
 You also can display actual node info using command:
->
 > `/view_node`
->
 ![view_node](https://github.com/dex2code/massa_acheta/blob/main/img/view_node.png?raw=true)
 
 ### 👉 Watch your staking
 In order to watch your wallet and staking activity, you need to add it to the service configuration. To do this use the command:
->
 > `/add_wallet`
->
 Acheta will ask you to select which node this wallet belongs to and will ask you to enter its address.
 
 After succesfuly adding a wallet, Acheta will try to obtain information about it from the node and display the status of this attempt.\
@@ -148,9 +124,7 @@ If the attempt is successful, Acheta will start to watch your wallet and will se
 Block notifications now rely on the counters of the last cycle, ensuring that no produced or missed block is lost even if the API only returns a limited history.
 
 You also can display actual wallet info using command:
->
 > `/view_wallet`
-> 
 ![view_wallet](https://github.com/dex2code/massa_acheta/blob/main/img/view_wallet.png?raw=true)
 
 ### 👉 Remind you about its status
@@ -160,28 +134,20 @@ These messages contains short useful information about your nodes and wallets, i
 
 ### 👉 Edit configuration
 To view your current configuration (added nodes and wallets) use command:
->
 > `/view_config`
->
 
 To remove added nodes or wallets use:
->
 > `/delete_node`\
 > `/delete_wallet`
->
 
 To reset the whole service configuration use:
->
 > `/reset`
->
 
 
 ### 👉 Watch full statistics of your added wallets
 Acheta collects statistics on all your added wallets and can show visual charts:
->
 > `/massa_info`\
 > `/massa_chart`
->
 ![massa_chart](https://github.com/dex2code/massa_acheta/blob/main/img/massa_chart.jpg?raw=true)
 ```
 Cycles collected: 34
@@ -189,10 +155,8 @@ Total stakers: 1,934 (d: -6)
 Total staked rolls: 363,222 (d: +1,551)
 ```
 
->
 > `/view_wallet`\
 > `/chart_wallet`
->
 ![chart_wallet](https://github.com/dex2code/massa_acheta/blob/main/img/wallet_staking_chart.jpg?raw=true)
 ```
 Cycles collected: 34
@@ -210,9 +174,7 @@ Fact Blocks / Cycle: 195.9706
 
 ### 👉 Watch deferred credits of any MASSA wallet
 Acheta can check provided MASSA wallet to display all future deferred credits (full list for two years)
->
 > `/view_credits`
->
 ![view_credits](https://github.com/dex2code/massa_acheta/blob/main/img/view_credits.png?raw=true)
 
 ## Notes

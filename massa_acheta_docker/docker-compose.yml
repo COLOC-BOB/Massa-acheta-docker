@@ -9,4 +9,3 @@ services:
       - ./app_results.json:/app/app_results.json
       - ./deferred_credits.json:/app/deferred_credits.json
       - ./app_stat.json:/app/app_stat.json
-      - ./public_dir.json:/app/public_dir.json

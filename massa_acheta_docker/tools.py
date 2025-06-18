@@ -375,61 +375,6 @@ async def get_rewards_blocks_cycle(rolls_number: int=0, total_rolls: int=0) -> f
 
 
 
-async def add_public_dir(chat_id: any, wallet_address: str="") -> bool:
-    logger.debug("-> Enter Def")
-
-    try:
-        chat_id = str(chat_id)
-        wallet_address = str(wallet_address)
-        app_globals.public_dir[chat_id] = wallet_address
-    
-    except BaseException as E:
-        logger.warning(f"Cannot save wallet '{wallet_address}' for user '{chat_id}' ({str(E)})")
-        return False
-    
-    else:
-        logger.info(f"Successfully saved wallet '{wallet_address}' for user '{chat_id}'")
-        return True
-
-
-async def get_public_dir(chat_id: any) -> str:
-    logger.debug("-> Enter Def")
-
-    public_wallet_address = None
-    try:
-        chat_id = str(chat_id)
-        public_wallet_address = app_globals.public_dir.get(chat_id, None)
-
-    except BaseException as E:
-        logger.warning(f"Cannot get public_wallet_addres for chat_id '{chat_id}' ({str(E)})")
-
-    if public_wallet_address:
-        logger.info(f"Found wallet '{public_wallet_address}' for chat_id '{chat_id}' in public_dir")
-        return str(public_wallet_address)
-
-    else:
-        logger.info(f"No wallet for chat_id '{chat_id}' in public_dir")
-        return None
-
-
-
-def save_public_dir() -> bool:
-    logger.debug("-> Enter Def")
-
-    try:
-        public_dir_obj = Path(app_config['service']['public_dir_path'])
-        with open(file=public_dir_obj, mode="wt") as output_public_dir:
-            output_public_dir.write(json.dumps(obj=app_globals.public_dir, indent=4))
-            output_public_dir.flush()
-                    
-    except BaseException as E:
-        logger.error(f"Cannot save public_dir into '{public_dir_obj}' file: ({str(E)})")
-        return False
-        
-    else:
-        logger.info(f"Successfully saved public_dir into '{public_dir_obj}' file!")
-        return True
-
 
 
 if __name__ == "__main__":

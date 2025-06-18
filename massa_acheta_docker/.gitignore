@@ -7,7 +7,6 @@ pyvenv.cfg
 deferred_credits.json
 app_results.json
 app_stat.json
-public_dir.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

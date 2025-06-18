@@ -213,26 +213,6 @@ else:
 
 
 
-### Init public_user_dir ###
-public_dir = {}
-
-public_dir_obj = Path(app_config['service']['public_dir_path'])
-
-if not public_dir_obj.exists():
-    logger.warning(f"No public_dir file '{public_dir_obj}' exists. Skipping...")
-
-else:
-    logger.info(f"Loading public_dir from '{public_dir_obj}' file...")
-
-    with open(file=public_dir_obj, mode="rt") as input_public_dir:
-        try:
-            public_dir = json.load(fp=input_public_dir)
-        
-        except BaseException as E:
-            logger.error(f"Cannot load public_dir from '{public_dir_obj}' file ({str(E)})")
-        
-        else:
-            logger.info(f"Successfully loaded public_dir from '{public_dir_obj}' file ({len(public_dir)} keys)")
 
 
 

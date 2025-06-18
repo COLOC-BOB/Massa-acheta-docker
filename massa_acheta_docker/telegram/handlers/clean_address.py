@@ -8,7 +8,6 @@ from aiogram.enums import ParseMode
 from aiogram.utils.formatting import as_list
 
 from app_config import app_config
-import app_globals
 
 
 router = Router()
@@ -24,8 +23,6 @@ async def cmd_clean_address(message: Message) -> None:
         "🗑 Address wiped!"
     )
     try:
-        chat_id = str(message.chat.id)
-        app_globals.public_dir.pop(chat_id, None)
         await message.reply(
             text=t.as_html(),
             parse_mode=ParseMode.HTML,
