@@ -23,7 +23,7 @@ async def cmd_acheta_release(message: Message, state: FSMContext) -> None:
     else:
         update_needed = (
             "☝ <b>Please update your bot</b> – "
-            '<a href="https://github.com/COLOC-BOB/massa_acheta_docker/releases/latest">More info here</a>'
+            '<a href="https://github.com/COLOC-BOB/Massa_acheta_docker/releases/latest">More info here</a>'
         )
 
     msg = (

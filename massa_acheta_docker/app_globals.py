@@ -139,7 +139,7 @@ ACHETA_CHAT = int(os.getenv("ACHETA_CHAT"))  # ID du chat à surveiller (groupe,
 telegram_queue = deque()
 
 # --- Acheta releases info (local, remote) ---
-local_acheta_release = "ACHETA.1.2.3"
+local_acheta_release = "v2.0.0"
 latest_acheta_release = ""
 
 # --- Init deferred_credits ---
