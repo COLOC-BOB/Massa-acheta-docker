@@ -1,123 +1,165 @@
+#massa_acheta_docker/remotes/heartbeat.py
 from loguru import logger
-
 import asyncio
-from aiogram.utils.formatting import as_list, as_line, TextLink
 
 from app_config import app_config
 import app_globals
 
-from telegram.queue import queue_telegram_message
-from tools import get_last_seen, get_short_address, get_rewards_mas_day, get_duration
+from alert_manager import send_alert
+from remotes_utils import get_last_seen, get_short_address, get_rewards_mas_day, get_duration
 
+def html_link(text, url):
+    return f'<a href="{url}">{text}</a>'
+
+def format_wallet_line(wallet_address, balance, produced_blocks, last_cycle, explorer_url):
+    return (
+        f"⦙<\n>"
+        f"⦙… {html_link(wallet_address, explorer_url)} "
+        f"( {balance} MAS | {produced_blocks} OK | cycle {last_cycle} )"
+    )
+
+def format_wallet_line_unknown(wallet_address, explorer_url):
+    return (
+        f"⦙<\n>"
+        f"⦙… {html_link(wallet_address, explorer_url)} "
+        f"( ? MAS | ? OK | cycle ? )"
+    )
 
 async def heartbeat() -> None:
-    logger.debug(f"-> Enter Def")
+    logger.debug("-> heartbeat")
 
     try:
         while True:
             logger.info(f"Sleeping for {app_config['service']['heartbeat_period_hours'] * 60 * 60} seconds...")
-            await asyncio.sleep(delay=(app_config['service']['heartbeat_period_hours'] * 60 * 60))
-            logger.info(f"Heartbeat planner shedule time")
+            await asyncio.sleep(app_config['service']['heartbeat_period_hours'] * 60 * 60)
+            logger.info("Heartbeat planner schedule time")
 
             computed_rewards = await get_rewards_mas_day(rolls_number=100)
 
             heartbeat_list = []
             heartbeat_list.append(
-                as_list(
-                    "📚 MASSA network info:",
-                    f" 👥 Total stakers: {app_globals.massa_network['values']['total_stakers']:,}",
-                    f" 🗞 Total staked rolls: {app_globals.massa_network['values']['total_staked_rolls']:,}",
-                    f"🪙 Estimated rewards for 100 Rolls ≈ {computed_rewards:,} MAS / Day",
-                    f"👁 Info updated: {await get_last_seen(last_time=app_globals.massa_network['values']['last_updated'])}", ""
-                )
+                "📚 <b>MASSA network info:</b><\n>"
+                f" 👥 Total stakers: <b>{app_globals.massa_network['values'].get('total_stakers', '?'):,}</b><\n>"
+                f" 🗞 Total staked rolls: <b>{app_globals.massa_network['values'].get('total_staked_rolls', '?'):,}</b><\n>"
+                f"🪙 Estimated rewards for 100 Rolls ≈ <b>{computed_rewards:,} MAS / Day</b><\n>"
+                f"👁 Info updated: {await get_last_seen(last_time=app_globals.massa_network['values'].get('last_updated'))}<\n>"
             )
 
-            if len(app_globals.app_results) == 0:
-                heartbeat_list.append("⭕ Node list is empty\n")
+            # Résumé global
+            total_nodes = len(app_globals.app_results)
+            online_nodes = sum(1 for n in app_globals.app_results.values() if n.get('last_status') == True)
+            offline_nodes = total_nodes - online_nodes
+            heartbeat_list.append(
+                f"<\n>🖥️ <b>Node summary:</b> {online_nodes} online / {offline_nodes} offline (total {total_nodes})<\n>"
+            )
 
-            else:
-                for node_name in app_globals.app_results:
-                    heartbeat_list.append(f"🏠 Node: \"{node_name}\"")
-                    heartbeat_list.append(f"📍 {app_globals.app_results[node_name]['url']}")
+            # Séparer nodes online/offline
+            nodes_online = [n for n in app_globals.app_results if app_globals.app_results[n].get('last_status') == True]
+            nodes_offline = [n for n in app_globals.app_results if app_globals.app_results[n].get('last_status') != True]
 
-                    last_seen = await get_last_seen(
-                        last_time=app_globals.app_results[node_name]['last_update']
-                    )
+            if total_nodes == 0:
+                heartbeat_list.append("⭕ Node list is empty<\n>")
+
+            # Section ONLINE
+            if nodes_online:
+                heartbeat_list.append("<\n>🟢 <b>Online nodes:</b>")
+                for node_name in nodes_online:
+                    node = app_globals.app_results[node_name]
+                    heartbeat_list.append(f"<\n>🏠 <b>Node:</b> \"{node_name}\"")
+                    heartbeat_list.append(f"📍 {node.get('url', '?')}")
+                    version = node.get('version', '?')
+                    node_ip = node.get('node_ip', '?')
+                    chain_id = node.get('last_chain_id', '?')
+                    last_seen = await get_last_seen(node.get('last_update'))
                     node_uptime = await get_duration(
-                        start_time=app_globals.app_results[node_name].get('start_time', 0),
+                        start_time=node.get('start_time', 0),
                         show_days=True
                     )
+                    # Infos réseau/stat (issus du get_status)
+                    network_stats = node.get('network_stats', {})
+                    in_con = network_stats.get('in_connection_count', '?')
+                    out_con = network_stats.get('out_connection_count', '?')
+                    peers = network_stats.get('known_peer_count', '?')
+                    banned = network_stats.get('banned_peer_count', '?')
 
-                    if app_globals.app_results[node_name]['last_status'] == True:
-                        heartbeat_list.append(f"🌿 Status: Online (uptime {node_uptime})")
+                    consensus = node.get('consensus_stats', {})
+                    final_blocks = consensus.get('final_block_count', '?')
+                    stale_blocks = consensus.get('stale_block_count', '?')
 
-                        num_wallets = len(app_globals.app_results[node_name]['wallets'])
-                        if num_wallets == 0:
-                            heartbeat_list.append("⭕ No wallets attached\n")
-                        else:
-                            heartbeat_list.append(f"👛 {num_wallets} wallet(s) attached:")
+                    heartbeat_list.append(
+                        f"🌿 <b>Status:</b> Online (uptime {node_uptime}, last update {last_seen})"
+                    )
+                    heartbeat_list.append(
+                        f"🔢 Version: <b>{version}</b> | Chain ID: <b>{chain_id}</b> | IP: <b>{node_ip}</b>"
+                    )
+                    heartbeat_list.append(
+                        f"🌐 Network: {peers} peers, {in_con} in / {out_con} out, 🚫 {banned} banned"
+                    )
+                    heartbeat_list.append(
+                        f"⛓️ Consensus: {final_blocks} final / {stale_blocks} stale blocks"
+                    )
 
-                            wallet_list = []
-
-                            for wallet_address in app_globals.app_results[node_name]['wallets']:
-
-                                if app_globals.app_results[node_name]['wallets'][wallet_address]['last_status'] == True:
-                                    balance = app_globals.app_results[node_name]['wallets'][wallet_address]['final_balance']
-                                    produced_blocks = app_globals.app_results[node_name]['wallets'][wallet_address]['produced_blocks']
-                                    last_cycle = app_globals.app_results[node_name]['wallets'][wallet_address]['last_cycle']
-
-                                    wallet_list.append(
-                                        as_line(
-                                            "⦙\n",
-                                            "⦙… ",
-                                            TextLink(
-                                                await get_short_address(address=wallet_address),
-                                                url=f"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}"
-                                            ),
-                                            f" ( {balance:,} MAS | {produced_blocks} OK | cycle {last_cycle} )",
-                                            end=""
-                                        )
-                                    )
-                                else:
-                                    wallet_list.append(
-                                        as_line(
-                                            "⦙\n",
-                                            "⦙… ",
-                                            TextLink(
-                                                await get_short_address(address=wallet_address),
-                                                url=f"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}"
-                                            ),
-                                            " ( ? MAS | ? OK | cycle ? )",
-                                            end=""
-                                        )
-                                    )
-                            
-                            heartbeat_list.append(as_list(*wallet_list))
-
+                    num_wallets = len(node['wallets'])
+                    if num_wallets == 0:
+                        heartbeat_list.append("⭕ No wallets attached<\n>")
                     else:
-                        heartbeat_list.append(f"☠️ Status: Offline ({last_seen})")
-                        heartbeat_list.append("⭕ No wallets info available")
+                        heartbeat_list.append(f"👛 {num_wallets} wallet(s) attached:")
+                        wallet_lines = []
+                        for wallet_address in node['wallets']:
+                            w = node['wallets'][wallet_address]
+                            explorer_url = f"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}"
+                            short_addr = await get_short_address(address=wallet_address)
+                            if w.get('last_status') == True:
+                                balance = w.get('final_balance', '?')
+                                produced_blocks = w.get('produced_blocks', '?')
+                                last_cycle = w.get('last_cycle', '?')
+                                wallet_lines.append(
+                                    format_wallet_line(short_addr, balance, produced_blocks, last_cycle, explorer_url)
+                                )
+                            else:
+                                wallet_lines.append(
+                                    format_wallet_line_unknown(short_addr, explorer_url)
+                                )
+                        heartbeat_list.append("<\n>".join(wallet_lines))
+                    heartbeat_list.append("<\n>")
 
-                    heartbeat_list.append("")
+            # Section OFFLINE
+            if nodes_offline:
+                heartbeat_list.append("<\n>🔴 <b>Offline nodes:</b>")
+                for node_name in nodes_offline:
+                    node = app_globals.app_results[node_name]
+                    heartbeat_list.append(f"<\n>🏠 <b>Node:</b> \"{node_name}\"")
+                    heartbeat_list.append(f"📍 {node.get('url', '?')}")
+                    last_seen = await get_last_seen(node.get('last_update'))
+                    heartbeat_list.append(f"☠️ <b>Status:</b> Offline (last seen {last_seen})")
+                    version = node.get('version', '?')
+                    node_ip = node.get('node_ip', '?')
+                    chain_id = node.get('last_chain_id', '?')
+                    heartbeat_list.append(
+                        f"🔢 Version: <b>{version}</b> | Chain ID: <b>{chain_id}</b> | IP: <b>{node_ip}</b>"
+                    )
+                    heartbeat_list.append("⭕ No wallets info available<\n>")
 
-            t = as_list(
-                "💓 Heartbeat message:", "",
-                *heartbeat_list,
-                f"⏳ Heartbeat schedule: every {app_config['service']['heartbeat_period_hours']} hour(s)"
+            # Compose le message complet
+            message_html = (
+                "💓 <b>Heartbeat message:</b>\n\n"
+                + "\n".join(heartbeat_list)
+                + f"\n⏳ Heartbeat schedule: every <b>{app_config['service']['heartbeat_period_hours']}</b> hour(s)"
             )
-            await queue_telegram_message(message_text=t.as_html())
 
+            await send_alert(
+                alert_type="heartbeat",
+                level="info",
+                html=message_html,
+                disable_web_page_preview=True
+            )
 
     except BaseException as E:
         logger.error(f"Exception {str(E)} ({E})")
-    
     finally:
-        logger.error(f"<- Quit Def")
+        logger.error("<- Quit heartbeat")
 
     return
-
-
-
 
 if __name__ == "__main__":
     pass

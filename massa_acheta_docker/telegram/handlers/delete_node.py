@@ -1,98 +1,63 @@
+# massa_acheta_docker/telegram/handlers/delete_node.py
 from loguru import logger
-
 from aiogram import Router, F
 from aiogram.types import Message
-from telegram.menu import build_menu_keyboard
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.utils.formatting import as_list, as_line, TextLink, Code
-from aiogram.enums import ParseMode
 
 from app_config import app_config
 import app_globals
 
 from telegram.keyboards.kb_nodes import kb_nodes
-from tools import get_short_address, save_app_results, check_privacy
-
+from telegram.menu_utils import build_menu_keyboard
+from remotes_utils import get_short_address, save_app_results
 
 class NodeRemover(StatesGroup):
     waiting_node_name = State()
-    waiting_wallet_address = State()
 
 router = Router()
 
-
-@router.message(StateFilter(None), Command("delete_node"))
+@router.message(Command("delete_node"))
 @logger.catch
 async def cmd_delete_node(message: Message, state: FSMContext) -> None:
-    logger.debug("->Enter Def")
-    logger.info(f"-> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
-    if not await check_privacy(message=message): return
-    
-    if len(app_globals.app_results) == 0:
-        t = as_list(
-            "⭕ Node list is empty",
-            "",
-            "👉 Use the command menu to learn how to add a node to bot"
-        )
-        try:
-            await message.reply(
-                text=t.as_html(),
-                parse_mode=ParseMode.HTML,
-                request_timeout=app_config['telegram']['sending_timeout_sec']
-            )
-        except BaseException as E:
-            logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
+    logger.debug("-> cmd_delete_node")
+    if message.chat.id != app_globals.ACHETA_CHAT:
+        return
 
+    if len(app_globals.app_results) == 0:
+        await message.reply(
+            text="⭕ Node list is empty\n\n👉 Use the command menu to learn how to add a node to bot",
+            parse_mode="HTML",
+            request_timeout=app_config['telegram']['sending_timeout_sec']
+        )
         await state.clear()
         return
 
-
-    t = as_list(
-        "❓ Tap the node to select or /cancel to quit the scenario:",
+    await message.reply(
+        text="❓ Tap the node to select or /cancel to quit the scenario:",
+        parse_mode="HTML",
+        reply_markup=kb_nodes(),
+        request_timeout=app_config['telegram']['sending_timeout_sec']
     )
-    try:
-        await message.reply(
-            text=t.as_html(),
-            parse_mode=ParseMode.HTML,
-            reply_markup=kb_nodes(),
-            request_timeout=app_config['telegram']['sending_timeout_sec']
-        )
-        await state.set_state(NodeRemover.waiting_node_name)
-    except BaseException as E:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
-        await state.clear()
-
-    return
-
-
+    await state.set_state(NodeRemover.waiting_node_name)
 
 @router.message(NodeRemover.waiting_node_name, F.text)
 @logger.catch
 async def delete_node(message: Message, state: FSMContext) -> None:
-    logger.debug("-> Enter Def")
-    logger.info(f"-> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
-    if not await check_privacy(message=message): return
+    logger.debug("-> delete_node")
+    if message.chat.id != app_globals.ACHETA_CHAT:
+        return
 
-    node_name = message.text
+    node_name = message.text.strip()
 
     if node_name not in app_globals.app_results:
-        t = as_list(
-            f"‼ Error: Unknown node \"{node_name}\"",
-            "",
-            as_line("👉 Try /delete_node to delete another node or use the command menu for help")
+        await message.reply(
+            text=f"‼️ <b>Error:</b> Unknown node \"{node_name}\"\n\n👉 Try /delete_node to delete another node or use the command menu for help",
+            parse_mode="HTML",
+            reply_markup=kb_nodes(),
+            request_timeout=app_config['telegram']['sending_timeout_sec']
         )
-        try:
-            await message.reply(
-                text=t.as_html(),
-                parse_mode=ParseMode.HTML,
-                reply_markup=build_menu_keyboard(message.chat.id != app_globals.bot.ACHETA_CHAT),
-                request_timeout=app_config['telegram']['sending_timeout_sec']
-            )
-        except BaseException as E:
-            logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
-
         await state.clear()
         return
 
@@ -100,46 +65,29 @@ async def delete_node(message: Message, state: FSMContext) -> None:
         async with app_globals.results_lock:
             app_globals.app_results.pop(node_name, None)
             save_app_results()
-
-    except BaseException as E:
+    except Exception as E:
         logger.error(f"Cannot remove node '{node_name}': ({str(E)})")
-        t = as_list(
-            as_line(
-                "‼ Error: Could not delete node ",
-                Code(await get_short_address(node_name))
-            ),
-            as_line(
-                "💻 Result: ",
-                Code(str(E))
-            ),
-            as_line(
-                "⚠ Try again later or watch logs to check the reason - ",
-                TextLink(
-                    "More info here",
-                    url="https://github.com/dex2code/massa_acheta/"
-                )
-            )
-        )
-
-    else:
-        logger.info(f"Successfully removed node '{node_name}'")
-        t = as_list(
-            as_line(
-                "👌 Successfully removed node ",
-                Code(await get_short_address(node_name))
-            ),
-            "👉 You can check new settings using /view_config command"
-        )
-
-    try:
+        short_name = await get_short_address(node_name)
         await message.reply(
-            text=t.as_html(),
-            parse_mode=ParseMode.HTML,
-            reply_markup=build_menu_keyboard(message.chat.id != app_globals.bot.ACHETA_CHAT),
+            text=(
+                f"‼️ <b>Error:</b> Could not delete node <code>{short_name}</code>\n"
+                f"💻 Result: <code>{E}</code>\n"
+                "⚠ Try again later or watch logs to check the reason."
+            ),
+            parse_mode="HTML",
+            reply_markup=kb_nodes(),
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
-    except BaseException as E:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
-
+    else:
+        logger.info(f"Successfully removed node '{node_name}'")
+        short_name = await get_short_address(node_name)
+        await message.reply(
+            text=(
+                f"👌 Successfully removed node <code>{short_name}</code>\n"
+                "👉 You can check new settings using /view_config command"
+            ),
+            parse_mode="HTML",
+            reply_markup=build_menu_keyboard(),
+            request_timeout=app_config['telegram']['sending_timeout_sec']
+        )
     await state.clear()
-    return

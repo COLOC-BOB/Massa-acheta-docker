@@ -1,40 +1,37 @@
+# massa_acheta_docker/telegram/handlers/unknown.py
 from loguru import logger
-
 from aiogram import Router, F
 from aiogram.types import Message
-from telegram.menu import build_menu_keyboard
 from aiogram.fsm.context import FSMContext
-from aiogram.utils.formatting import as_list
-from aiogram.enums import ParseMode
+
 
 from app_config import app_config
 import app_globals
-
+from telegram.menu_utils import build_menu_keyboard
 
 router = Router()
-
 
 @router.message(F)
 @logger.catch
 async def cmd_unknown(message: Message, state: FSMContext) -> None:
-    logger.debug("-> Enter Def")
-    logger.info(f"-> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
+    logger.debug("-> cmd_unknown")
+    if message.chat.id != app_globals.ACHETA_CHAT:
+        return
 
-    t = as_list(
-        f"⁉ Error: Unknown command",
-        "",
+    t = (
+        "⁉️ <b>Error: Unknown command</b>\n"
         "👉 Use the command menu to explore available commands"
     )
+    keyboard = build_menu_keyboard()
+
     try:
-        public = message.chat.id != app_globals.bot.ACHETA_CHAT
         await message.reply(
-            text=t.as_html(),
-            reply_markup=build_menu_keyboard(public),
-            parse_mode=ParseMode.HTML,
+            text=t,
+            reply_markup=keyboard,
+            parse_mode="HTML",
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
-    except BaseException as E:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
+    except Exception as e:
+        logger.error(f"Could not send unknown command message: {e}")
 
     await state.clear()
-    return

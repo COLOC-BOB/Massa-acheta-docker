@@ -1,0 +1,64 @@
+Invoke-RestMethod -Method POST `
+  -Uri "https://mainnet.massa.net/api/v2" `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"id":0,"jsonrpc":"2.0","method":"get_stakers","params":[{"limit":1000,"offset":0}]}'
+
+Invoke-RestMethod -Uri "https://mainnet.massa.net/api/v2" `
+  -Method Post `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"jsonrpc":"2.0","method":"get_addresses","params":[["AU12eU7k2YSBNX7maKB8kzzvHfdfdr8YKSG2Bv9nUg9HRFvpsaS79"]],"id":0}'
+
+$response = Invoke-RestMethod -Uri "https://mainnet.massa.net/api/v2" `
+  -Method Post `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"jsonrpc":"2.0","method":"get_addresses","params":[["AU12eU7k2YSBNX7maKB8kzzvHfdfdr8YKSG2Bv9nUg9HRFvpsaS79"]],"id":0}'
+
+$response | ConvertTo-Json -Depth 10
+
+# Paramètres
+$apiUrl = "https://mainnet.massa.net/api/v2"
+$payload = @{
+    jsonrpc = "2.0"
+    method = "get_addresses"
+    params = @(,@("AU12L4gaQ8j8j5yBt2jSmcsmu51yZW2gLjnZr5rAWnjKJDNacR3jp"))
+    id = 0
+} | ConvertTo-Json
+$response = Invoke-RestMethod -Uri $apiUrl -Method Post -Body $payload -ContentType "application/json"
+$response.result[0].created_blocks
+
+149.102.158.108
+92.42.106.204
+188.165.193.20
+http://188.165.193.20:33035/api/v2
+
+$apiUrl = "https://mainnet.massa.net/api/v2"
+$blockId = "B1VSUe7pbVN3UocmHbdrHSvbmkgNTnJ6zk11M1YqEbNuYytJsax"
+$payload = @{
+    jsonrpc = "2.0"
+    method = "get_blocks"
+    params = @(, @($blockId))
+    id = 0
+} | ConvertTo-Json
+
+$response = Invoke-RestMethod -Uri $apiUrl -Method Post -Body $payload -ContentType "application/json"
+
+$response | ConvertTo-Json -Depth 10
+
+Python:
+import requests
+import json
+
+api_url = "https://mainnet.massa.net/api/v2"
+block_id = "B12Nq4qdcG1e9Psuwi5akiAV6qQyVKw3TNjyBQDUCiazkFfTRCrG"
+
+payload = {
+    "jsonrpc": "2.0",
+    "method": "get_blocks",
+    "params": [[block_id]],  # bien [[block_id]] et PAS [block_id] ni [[, block_id]]
+    "id": 0
+}
+
+headers = {"Content-Type": "application/json"}
+
+resp = requests.post(api_url, data=json.dumps(payload), headers=headers)
+print(resp.text)

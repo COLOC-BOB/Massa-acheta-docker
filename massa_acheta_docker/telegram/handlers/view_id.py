@@ -1,40 +1,34 @@
+# massa_acheta_docker/telegram/handlers/view_id.py
 from loguru import logger
-
 from aiogram import Router
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
-from aiogram.enums import ParseMode
-from aiogram.utils.formatting import as_list, as_line, Code
+from aiogram.fsm.context import FSMContext
 
 from app_config import app_config
-
+import app_globals
+from telegram.menu_utils import build_menu_keyboard
 
 router = Router()
 
-
 @router.message(StateFilter(None), Command("view_id"))
 @logger.catch
-async def cmd_view_id(message: Message) -> None:
-    logger.debug("-> Enter Def")
-    logger.info(f"-> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
+async def cmd_view_id(message: Message, state: FSMContext) -> None:
+    logger.debug("-> cmd_view_id")
+    user_id = message.from_user.id
+    chat_id = message.chat.id
 
-    t = as_list(
-        as_line(
-            "👤 User ID: ",
-            Code(message.from_user.id)
-        ),
-        as_line(
-            "💬 Chat ID: ",
-            Code(message.chat.id)
-        )
+    text = (
+        f"👤 <b>User ID:</b> <code>{user_id}</code>\n"
+        f"💬 <b>Chat ID:</b> <code>{chat_id}</code>"
     )
+
     try:
         await message.reply(
-            text=t.as_html(),
-            parse_mode=ParseMode.HTML,
-            request_timeout=app_config['telegram']['sending_timeout_sec']
+            text=text,
+            parse_mode="HTML",
+            reply_markup=build_menu_keyboard(),
+              request_timeout=app_config['telegram']['sending_timeout_sec']
         )
-    except BaseException as E:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
-
-    return
+    except Exception as e:
+        logger.error(f"Could not send message to user '{user_id}' in chat '{chat_id}' ({str(e)})")

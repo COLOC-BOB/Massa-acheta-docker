@@ -1,51 +1,45 @@
+# massa_acheta_docker/telegram/handlers/acheta_release.py
 from loguru import logger
-
 from aiogram import Router
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command
 from aiogram.types import Message
-from aiogram.enums import ParseMode
-from aiogram.utils.formatting import as_list, as_line, TextLink
+from aiogram.fsm.context import FSMContext
 
 from app_config import app_config
 import app_globals
-
-from tools import check_privacy
-
+from telegram.menu_utils import build_menu_keyboard
 
 router = Router()
 
-
-@router.message(StateFilter(None), Command("acheta_release"))
+@router.message(Command("acheta_release"))
 @logger.catch
-async def cmd_acheta_release(message: Message) -> None:
-    logger.debug("-> Enter Def")
-    logger.info(f"-> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
-    if not await check_privacy(message=message): return
+async def cmd_acheta_release(message: Message, state: FSMContext) -> None:
+    logger.debug("-> cmd_acheta_release")
+    if message.chat.id != app_globals.ACHETA_CHAT:
+        return
 
     if app_globals.latest_acheta_release == app_globals.local_acheta_release:
-        update_needed = as_line("👌 No updates needed")
+        update_needed = "👌 <b>No updates needed</b>"
     else:
-        update_needed = as_line(
-            "☝ Please update your bot - ",
-            TextLink(
-                "More info here",
-                url="https://api.github.com/repos/COLOC-BOB/massa_acheta_docker/releases/latest"
-            )
+        update_needed = (
+            "☝ <b>Please update your bot</b> – "
+            '<a href="https://github.com/COLOC-BOB/massa_acheta_docker/releases/latest">More info here</a>'
         )
 
-    t = as_list(
-        f"🦗 Latest released ACHETA version: \"{app_globals.latest_acheta_release}\"",
-        f"💾 You have version: \"{app_globals.local_acheta_release}\"", "",
-        update_needed,
-        as_line(f"⏳ Service checks releases: every {app_config['service']['main_loop_period_min']} minutes")
+    msg = (
+        f"🦗 <b>Latest released ACHETA DOCKER version:</b> {app_globals.latest_acheta_release}\n"
+        f"💾 <b>You have version:</b> {app_globals.local_acheta_release}\n"
+        f"{update_needed}\n"
+        f"⏳ <b>Service checks releases:</b> every {app_config['service']['main_loop_period_min']} minutes"
     )
+
     try:
         await message.reply(
-            text=t.as_html(),
-            parse_mode=ParseMode.HTML,
+            text=msg,
+            parse_mode="HTML",
+            reply_markup=build_menu_keyboard(),
             request_timeout=app_config['telegram']['sending_timeout_sec']
-        )
-    except BaseException as E:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
 
-    return
+        )
+    except Exception as e:
+        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(e)})")

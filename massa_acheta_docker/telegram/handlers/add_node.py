@@ -1,20 +1,17 @@
+# massa_acheta_docker/telegram/handlers/add_node.py
 from loguru import logger
-
 import asyncio
 from aiogram import Router, F
 from aiogram.types import Message
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.utils.formatting import as_list, as_line, TextLink, Code
-from aiogram.enums import ParseMode
 
 from app_config import app_config
 import app_globals
-
 from remotes.node import check_node
-from tools import get_short_address, save_app_results, check_privacy
-
+from remotes_utils import save_app_results, pull_http_api
+from telegram.menu_utils import build_menu_keyboard
 
 class NodeAdder(StatesGroup):
     waiting_node_name = State()
@@ -22,159 +19,144 @@ class NodeAdder(StatesGroup):
 
 router = Router()
 
-
-@router.message(StateFilter(None), Command("add_node"))
+@router.message(Command("add_node"))
 @logger.catch
 async def cmd_add_node(message: Message, state: FSMContext) -> None:
-    logger.debug("->Enter Def")
-    logger.info(f"-> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
-    if not await check_privacy(message=message): return
-    
-    t = as_list(
-        "❓ Please enter a short name for the new node (nickname) or /cancel to quit the scenario:",
-    )
+    logger.debug("-> cmd_add_node")
+    if message.chat.id != app_globals.ACHETA_CHAT:
+        return
+    await state.set_state(NodeAdder.waiting_node_name)
     try:
-        await state.set_state(NodeAdder.waiting_node_name)
         await message.reply(
-            text=t.as_html(),
-            parse_mode=ParseMode.HTML,
+            text="❓ Please enter a short name for the new node (nickname) or /cancel to quit the scenario:",
+            parse_mode="HTML",
+            reply_markup=build_menu_keyboard(),
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
-    except BaseException as E:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
+    except Exception as e:
+        logger.error(f"Could not send message: {e}")
         await state.clear()
-
-    return
-
-
 
 @router.message(NodeAdder.waiting_node_name, F.text)
 @logger.catch
 async def input_nodename_to_add(message: Message, state: FSMContext) -> None:
-    logger.debug("-> Enter Def")
-    logger.info(f"-> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
-    if not await check_privacy(message=message): return
+    if message.chat.id != app_globals.ACHETA_CHAT:
+        return
 
-    node_name = message.text
-
+    node_name = message.text.strip()
     if node_name in app_globals.app_results:
-        t = as_list(
-            f"‼ Error: Node with nickname \"{node_name}\" already exists",
-            "",
-            "👉 Try /add_node to add another node or use the command menu for help"
+        await message.reply(
+            text=f"‼️ <b>Error:</b> Node with nickname {node_name} already exists\n👉 Try /add_node to add another node\n",
+            parse_mode="HTML",
+            reply_markup=build_menu_keyboard(),
+            request_timeout=app_config['telegram']['sending_timeout_sec']
         )
-        try:
-            await message.reply(
-                text=t.as_html(),
-                parse_mode=ParseMode.HTML,
-                request_timeout=app_config['telegram']['sending_timeout_sec']
-            )
-        except BaseException as E:
-            logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
-
         await state.clear()
         return
 
-
-    t = as_list(
-        f"❓ Please enter API URL for the new node \"{node_name}\" with leading \"http(s)://...\" prefix or /cancel to quit the scenario: ", "",
-        "☝ Typically API URL looks like: http://ip.ad.dre.ss:33035/api/v2"
-    )
+    await state.set_state(NodeAdder.waiting_node_url)
+    await state.set_data(data={"node_name": node_name})
     try:
-        await state.set_state(NodeAdder.waiting_node_url)
-        await state.set_data(data={"node_name": node_name})
         await message.reply(
-            text=t.as_html(),
-            parse_mode=ParseMode.HTML,
+            text=(
+                f"❓ Please enter API URL for the new node {node_name} with leading http(s)://... or /cancel to quit.\n"
+                "☝ Typically API URL looks like: http://ip.ad.dre.ss:33035/api/v2"
+            ),
+            parse_mode="HTML",
+            reply_markup=build_menu_keyboard(),
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
-    except BaseException as E:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
+    except Exception as e:
+        logger.error(f"Could not send message: {e}")
         await state.clear()
-
-    return
-
-
 
 @router.message(NodeAdder.waiting_node_url, F.text.startswith("http"))
 @logger.catch
 async def add_node(message: Message, state: FSMContext) -> None:
-    logger.debug("-> Enter Def")
-    logger.info(f"-> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
-    if not await check_privacy(message=message): return
+    if message.chat.id != app_globals.ACHETA_CHAT:
+        return
 
     try:
         user_state = await state.get_data()
         node_name = user_state['node_name']
-        node_url = message.text
-    except BaseException as E:
-        logger.error(f"Cannot read state for user '{message.from_user.id}' from chat '{message.chat.id}' ({str(E)})")
+        node_url = message.text.strip()
+    except Exception as e:
+        logger.error(f"Cannot read state: {e}")
         await state.clear()
         return
 
+    local_wallet = None
+    auto_wallet_msg = ""
+
     try:
+        # Ajout du node à la config
         async with app_globals.results_lock:
-            app_globals.app_results[node_name] = {}
-            app_globals.app_results[node_name]['url'] = node_url
-            app_globals.app_results[node_name]['last_status'] = "unknown"
-            app_globals.app_results[node_name]['last_update'] = 0
-            app_globals.app_results[node_name]['start_time'] = 0
-            app_globals.app_results[node_name]['last_result'] = {"unknown": "Never updated before"}
-            app_globals.app_results[node_name]['wallets'] = {}
+            app_globals.app_results[node_name] = {
+                'url': node_url,
+                'last_status': "unknown",
+                'last_update': 0,
+                'start_time': 0,
+                'last_result': {"unknown": "Never updated before"},
+                'wallets': {}
+            }
+
+            # Essaye de récupérer le wallet local via /wallet_info
+            try:
+                wallet_info = await pull_http_api(node_url, "wallet_info")
+                if wallet_info and "result" in wallet_info:
+                    local_wallet = wallet_info["result"].get("address")
+                    if local_wallet:
+                        if local_wallet not in app_globals.app_results[node_name]['wallets']:
+                            app_globals.app_results[node_name]['wallets'][local_wallet] = {
+                                "last_status": None,
+                                "last_result": {},
+                                "added_automatically": True
+                            }
+                            logger.info(f"Wallet local {local_wallet} ajouté automatiquement pour le nœud {node_name}")
+                            auto_wallet_msg = (
+                                f"\n👛 Wallet local détecté et ajouté à la surveillance : <code>{local_wallet}</code>"
+                            )
+                        else:
+                            auto_wallet_msg = (
+                                f"\n👛 Wallet local déjà surveillé : <code>{local_wallet}</code>"
+                            )
+                    else:
+                        auto_wallet_msg = "\nℹ️ Aucun wallet local n'a été détecté sur ce nœud."
+                else:
+                    auto_wallet_msg = "\nℹ️ Impossible d’obtenir d’info wallet local via /wallet_info."
+            except Exception as e:
+                logger.warning(f"Erreur lors de la récupération du wallet local via /wallet_info pour le nœud {node_name}: {e}")
+                auto_wallet_msg = "\nℹ️ Erreur lors de la récupération du wallet local."
+
             save_app_results()
-
-    except BaseException as E:
-        logger.error(f"Cannot add node '{node_name}' with URL '{node_url}': ({str(E)})")
-        t = as_list(
-            as_line(
-                "‼ Error: Could not add node ",
-                Code(await get_short_address(node_name)),
-                f" with API URL {node_url}"
-            ),
-            as_line(
-                "💻 Result: ",
-                Code(str(E))
-            ),
-            as_line(
-                "⚠ Try again later or watch logs to check the reason - ",
-                TextLink(
-                    "More info here",
-                    url="https://github.com/dex2code/massa_acheta/"
-                )
-            )
-        )
-
-    else:
-        logger.info(f"Successfully added node '{node_name}' with URL '{node_url}'")
-        t = as_list(
-            as_line(
-                "✅ Successfully added node: ",
-                Code(await get_short_address(node_name)),
-                f" with API URL: {node_url}"
-            ),
-            "👁 Please note that bot will update info for this node a bit later", "",
-            "☝ You can add wallet to node using /add_wallet command", "",
-            "⚠ Please also check if you opened a firewall on the MASSA node host:",
-            as_line(
-                "Use ",
-                Code("sudo ufw allow 33035/tcp"),
-                " command on Ubuntu hosts"
-            )
-        )
-
-    try:
         await message.reply(
-            text=t.as_html(),
-            parse_mode=ParseMode.HTML,
+            text=(
+                f"✅ Successfully added node <b>{node_name}</b> with API URL: <code>{node_url}</code>\n"
+                "👁 Please note that bot will update info for this node a bit later.\n"
+                "☝️ You can add wallet to node using /add_wallet command."
+                f"{auto_wallet_msg}"
+            ),
+            parse_mode="HTML",
+            reply_markup=build_menu_keyboard(),
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
-    except BaseException as E:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(E)})")
-
+    except Exception as e:
+        logger.error(f"Cannot add node: {e}")
+        await message.reply(
+            text=(
+                f"‼️ Error: Could not add node <b>{node_name}</b> with API URL {node_url}\n"
+                f"💻 Result: <code>{e}</code>"
+            ),
+            parse_mode="HTML",
+            reply_markup=build_menu_keyboard(),
+            request_timeout=app_config['telegram']['sending_timeout_sec']
+        )
     await state.clear()
 
-    if app_globals.app_results[node_name]['last_status'] != True:
-        async with app_globals.results_lock:
-            await asyncio.gather(check_node(node_name=node_name))
-
-    return
+    # Lance check_node pour peupler les infos du node tout de suite
+    try:
+        if app_globals.app_results[node_name]['last_status'] != True:
+            async with app_globals.results_lock:
+                await asyncio.gather(check_node(node_name=node_name))
+    except Exception as e:
+        logger.warning(f"check_node failed after node add: {e}")
