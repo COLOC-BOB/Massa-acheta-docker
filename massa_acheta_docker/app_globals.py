@@ -8,6 +8,7 @@ from collections import deque
 from time import time
 from dotenv import load_dotenv
 import os
+import requests
 
 from app_config import app_config
 from remotes_utils import save_app_results
@@ -139,8 +140,19 @@ ACHETA_CHAT = int(os.getenv("ACHETA_CHAT"))  # ID du chat à surveiller (groupe,
 telegram_queue = deque()
 
 # --- Acheta releases info (local, remote) ---
+def fetch_latest_github_release():
+    url = "https://api.github.com/repos/COLOC-BOB/Massa-acheta-docker/releases/latest"
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return data.get("tag_name", "")
+    except Exception as e:
+        logger.warning(f"Could not fetch latest GitHub release: {e}")
+        return ""
+    
 local_acheta_release = "v2.0.0"
-latest_acheta_release = ""
+latest_acheta_release = fetch_latest_github_release()
 
 # --- Init deferred_credits ---
 deferred_credits = {}
