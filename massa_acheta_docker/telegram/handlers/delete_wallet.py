@@ -71,6 +71,8 @@ async def select_wallet_to_delete(message: Message, state: FSMContext) -> None:
         )
         await state.clear()
         return
+    
+    logger.info(f"Set state: WalletRemover.waiting_wallet_address for node {node_name}")
 
     await state.set_state(WalletRemover.waiting_wallet_address)
     await state.set_data(data={"node_name": node_name})
@@ -85,6 +87,7 @@ async def select_wallet_to_delete(message: Message, state: FSMContext) -> None:
 @logger.catch
 async def delete_wallet(message: Message, state: FSMContext) -> None:
     logger.debug("-> delete_wallet")
+    logger.info(f"Delete wallet handler triggered for message: {message.text}")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 

@@ -10,7 +10,6 @@ PRIVATE_COMMANDS = [
     ("/view_wallet", "View wallet info", "Mon wallet"),
     ("/chart_wallet", "View wallet chart", "Graphique wallet"),
     ("/view_address", "View any wallet info", "Infos wallet"),
-    ("/clean_address", "Clean remembered address", "Effacer wallet"),
     ("/view_credits", "View any wallet credits", "Crédits wallet"),
     ("/view_earnings", "View rewards for staking", "Récompenses"),
     ("/add_node", "Add node to bot", "Ajouter un nœud"),
