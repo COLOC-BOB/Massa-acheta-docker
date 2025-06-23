@@ -7,8 +7,9 @@ from watcher_utils import load_json_watcher, save_json_watcher
 from remotes_utils import pull_http_api
 import app_globals
 from alert_manager import send_alert
+from watchers.watchers_control import is_watcher_enabled
 
-WATCH_FILE = "watchers_state/blocks_seen.json"
+WATCH_FILE = "watchers_state/blocks_seen.json"     
 
 def log_short_blocks(wallet_address, blocks, label="created_blocks", preview=10):
     n = len(blocks)
@@ -85,6 +86,11 @@ async def watch_blocks(polling_interval=10):
 
     logger.info("Watcher: blocks started")
     while True:
+        if not is_watcher_enabled("blocks"):
+            logger.info("[BLOCKS] Désactivé, je dors...")
+            await asyncio.sleep(60)
+            continue
+        
         for node_name, node_data in app_globals.app_results.items():
             node_url = node_data.get("url")
             for wallet_address in node_data.get("wallets", {}):
@@ -139,3 +145,6 @@ async def watch_blocks(polling_interval=10):
                     except Exception as e:
                         logger.error(f"Erreur sauvegarde {WATCH_FILE}: {e}")
         await asyncio.sleep(polling_interval)
+
+    await save_history(history)
+    await asyncio.sleep(polling_interval)

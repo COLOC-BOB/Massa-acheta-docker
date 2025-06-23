@@ -38,6 +38,7 @@ from telegram.handlers import reset
 from telegram.handlers import unknown
 from telegram.menu import router as menu_router
 from telegram.handlers import help
+from telegram.handlers import watchers_menu
 
 from remotes_utils import save_app_stat, save_app_results, update_deferred_credits_from_node
 
@@ -128,7 +129,8 @@ async def main() -> None:
         tg_dp.include_router(reset.router)
         tg_dp.include_router(menu_router)  
         tg_dp.include_router(unknown.router)
-
+        tg_dp.include_router(watchers_menu.router)
+        
         await tg_bot.delete_webhook(drop_pending_updates=True)
         await tg_dp.start_polling(tg_bot)
 

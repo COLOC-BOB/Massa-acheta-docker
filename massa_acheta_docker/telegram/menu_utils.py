@@ -20,6 +20,7 @@ PRIVATE_COMMANDS = [
     ("/massa_chart", "Show MASSA network chart", "Graphique MASSA"),
     ("/acheta_release", "Actual Acheta release", "Version Acheta"),
     ("/view_id", "Show your TG ID", "Mon ID"),
+    ("/watchers", "Show watchers menu", "Watchers"),
     ("/cancel", "Cancel ongoing scenario", "Annuler"),
     ("/reset", "Reset bot configuration", "Réinitialiser"),
 ]

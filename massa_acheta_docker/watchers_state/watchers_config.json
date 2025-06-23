@@ -1,0 +1,6 @@
+{
+  "rolls": true,
+  "blocks": false,
+  "balance": true,
+  "heartbeat": true
+}

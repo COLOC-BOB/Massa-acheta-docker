@@ -19,6 +19,7 @@ from telegram.handlers.cancel import cmd_cancel
 from telegram.handlers.reset import cmd_reset
 from telegram.handlers.unknown import cmd_unknown
 from telegram.handlers.help import cmd_help
+from telegram.handlers.watchers_menu import cmd_watchers_menu
 
 async def dispatch_command(cmd: str, msg, state: FSMContext):
     if cmd == "/help":
@@ -53,6 +54,8 @@ async def dispatch_command(cmd: str, msg, state: FSMContext):
         await cmd_acheta_release(msg, state)
     elif cmd == "/view_id":
         await cmd_view_id(msg, state)
+    elif cmd == "/watchers":
+        await cmd_watchers_menu(msg, state)
     elif cmd == "/cancel":
         await cmd_cancel(msg, state)
     elif cmd == "/reset":

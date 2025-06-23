@@ -65,7 +65,7 @@ async def acheta_release() -> None:
         acheta_release_answer = await pull_http_api(
             api_url=app_config['service']['acheta_release_url'],
             api_method="GET",
-            api_root_element="name"
+            api_root_element="tag_name"
         )
 
         acheta_release_result = acheta_release_answer.get("result", None)
@@ -87,12 +87,12 @@ async def acheta_release() -> None:
                 "",
                 f"💾 You have version: <b>{app_globals.local_acheta_release}</b>",
                 "",
-                f"⚠ Update your bot version – {text_link('More info here', 'https://github.com/dex2code/massa_acheta/')}"
+                f"⚠ Update your bot version – {text_link('More info here', 'https://github.com/COLOC-BOB/Massa-acheta-docker/releases')}"
             ]
             await send_alert(
                 alert_type="acheta_release",
                 level="info",
-                html=format_html_message(message_lines)
+                html=format_html_message(message_lines) 
             )
 
             app_globals.latest_acheta_release = acheta_release_result
