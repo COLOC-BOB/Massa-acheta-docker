@@ -112,7 +112,7 @@ async def add_wallet(message: Message, state: FSMContext) -> None:
         try:
             await message.reply(
                 text=(
-                    f"‼️ <b>Error:</b> Wallet <a href={app_config['service']['mainnet_explorer_url']}/address/{wallet_address}>{short_addr}</a> already attached to node {node_name}\n"
+                    f"‼️ <b>Error:</b> Wallet <a href=\"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}\">{short_addr}</a> already attached to node {node_name}\n"
                     "👉 Try /add_wallet to add another wallet or use the command menu for help"
                 ),
                 parse_mode="HTML",
@@ -150,7 +150,7 @@ async def add_wallet(message: Message, state: FSMContext) -> None:
         try:
             await message.reply(
                 text=(
-                    f"‼️ <b>Error:</b> Could not add wallet <a href={app_config['service']['mainnet_explorer_url']}/address/{wallet_address}>{short_addr}</a> to node {node_name}\n"
+                    f"‼️ <b>Error:</b> Could not add wallet <a href=\"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}\">{short_addr}</a> to node {node_name}\n"
                     f"💻 Result: <code>{E}</code>\n"
                     "⚠ Try again later or watch logs to check the reason."
                 ),
@@ -168,7 +168,7 @@ async def add_wallet(message: Message, state: FSMContext) -> None:
     try:
         await message.reply(
             text=(
-                f"👌 Successfully added wallet: <a href={app_config['service']['mainnet_explorer_url']}/address/{wallet_address}>{short_addr}</a>\n"
+                f"👌 Successfully added wallet: <a href=\"{app_config['service']['mainnet_explorer_url']}/address/{wallet_address}\">{short_addr}</a>\n"
                 f"🏠 Node: {node_name}\n"
                 f"📍 <code>{app_globals.app_results[node_name]['url']}</code>\n\n"
                 "👁 You can check new settings using /view_config command\n\n"
@@ -176,7 +176,8 @@ async def add_wallet(message: Message, state: FSMContext) -> None:
             ),
             parse_mode="HTML",
             reply_markup=build_menu_keyboard(),
-            request_timeout=app_config['telegram']['sending_timeout_sec']
+            request_timeout=app_config['telegram']['sending_timeout_sec'],
+            disable_web_page_preview=True
         )
     except Exception as e:
         logger.error(f"Could not send message: {e}")

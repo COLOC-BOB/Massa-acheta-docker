@@ -1,36 +1,69 @@
+# massa_acheta_docker/watchers/missed_blocks.py
+
 import asyncio
 import json
 import os
-import time
 from datetime import datetime
 from loguru import logger
 from remotes_utils import pull_http_api
 import app_globals
 from alert_manager import send_alert
+from watchers.watchers_control import is_watcher_enabled
 
 WATCH_FILE = "watchers_state/missed_blocks_seen.json"
+_save_lock = asyncio.Lock()
 
-def load_history():
+def load_json_history():
     if os.path.exists(WATCH_FILE):
         try:
             with open(WATCH_FILE, "rt") as f:
                 return json.load(f)
         except Exception as e:
-            logger.error(f"Could not load missed blocks history: {e}")
+            logger.error(f"Could not load missed blocks watcher state: {e}")
     return {}
 
-def save_history(history):
-    with open(WATCH_FILE, "wt") as f:
-        json.dump(history, f, indent=2)
+async def save_json_history(history):
+    async with _save_lock:
+        tmp_file = WATCH_FILE + ".tmp"
+        try:
+            with open(tmp_file, "wt") as f:
+                json.dump(history, f, indent=2, ensure_ascii=False)
+            os.replace(tmp_file, WATCH_FILE)
+        except Exception as e:
+            logger.error(f"Could not save missed blocks watcher state: {e}")
 
 async def watch_missed_blocks(polling_interval=30):
-    logger.info("Watcher: missed_blocks started")
-    history = load_history()
+    logger.info("[MISSED_BLOCK] JSON Watcher started")
+    # Structure :
+    # {
+    #   "My node": {
+    #     "AU12xxx...": [
+    #         {"datetime": "...", "cycle": ..., "missed": ...},
+    #         ...
+    #     ],
+    #     ...
+    #   },
+    #   ...
+    # }
+    history = load_json_history()
+    if not isinstance(history, dict):
+        history = {}
 
     while True:
+        if not is_watcher_enabled("missed_blocks"):
+            logger.info("[MISSED_BLOCK] Désactivé, je dors...")
+            await asyncio.sleep(60)
+            continue
+
         for node_name, node_data in app_globals.app_results.items():
-            for wallet_address in node_data.get("wallets", {}):
-                # Appel API pour obtenir infos du wallet
+            wallets = node_data.get("wallets", {})
+            if not wallets:
+                continue
+
+            if node_name not in history:
+                history[node_name] = {}
+
+            for wallet_address in wallets:
                 try:
                     resp = await pull_http_api(
                         api_url=node_data['url'],
@@ -43,48 +76,59 @@ async def watch_missed_blocks(polling_interval=30):
                         }),
                         api_content_type="application/json"
                     )
-                    result = resp.get("result")
-                    if not result or not isinstance(result, list):
+                    if (
+                        not resp or
+                        "result" not in resp or
+                        "result" not in resp["result"] or
+                        not isinstance(resp["result"]["result"], list) or
+                        not resp["result"]["result"]
+                    ):
                         continue
-                    cycle_infos = result[0].get("cycle_infos", [])
+
+                    addr_info = resp["result"]["result"][0]
+                    cycle_infos = addr_info.get("cycle_infos", [])
+
+                    if wallet_address not in history[node_name]:
+                        history[node_name][wallet_address] = []
+
+                    # On récupère les entrées déjà enregistrées (cycle, missed)
+                    seen = {(c["cycle"], c["missed"]) for c in history[node_name][wallet_address] if "cycle" in c and "missed" in c}
+
+                    for cycle in cycle_infos:
+                        cycle_num = cycle.get("cycle")
+                        missed = cycle.get("nok_count", 0)
+                        if missed and missed > 0:
+                            key_tuple = (cycle_num, missed)
+                            if key_tuple not in seen:
+                                now_iso = datetime.now().isoformat()
+                                entry = {
+                                    "datetime": now_iso,
+                                    "cycle": cycle_num,
+                                    "missed": missed
+                                }
+                                history[node_name][wallet_address].append(entry)
+                                seen.add(key_tuple)
+
+                                message = (
+                                    f"❌ <b>Bloc manqué détecté</b>\n"
+                                    f"👛 Wallet: <code>{wallet_address}</code>\n"
+                                    f"🏠 Node: <b>{node_name}</b>\n"
+                                    f"🌀 Cycle: <b>{cycle_num}</b>\n"
+                                    f"⛔ Total manqués ce cycle: <b>{missed}</b>\n"
+                                    f"🕒 {now_iso}\n"
+                                    f"🗂 Ajouté à l'historique."
+                                )
+                                await send_alert(
+                                    alert_type="wallet_block_miss",
+                                    node=node_name,
+                                    wallet=wallet_address,
+                                    level="warning",
+                                    html=message
+                                )
+                                logger.warning(f"[MISSED_BLOCK] New missed block for {wallet_address}@{node_name}: cycle={cycle_num}, missed={missed}")
+
                 except Exception as e:
-                    logger.error(f"Error fetching wallet {wallet_address}: {e}")
-                    continue
+                    logger.error(f"[MISSED_BLOCK] Error fetching wallet {wallet_address}: {e}")
 
-                # Parcours chaque cycle du wallet pour détecter des blocks manqués
-                for cycle in cycle_infos:
-                    cycle_num = cycle.get("cycle")
-                    missed = cycle.get("nok_count", 0)
-                    if missed and missed > 0:
-                        # Clef unique : wallet + cycle + nombre manqués
-                        key = f"{wallet_address}:{cycle_num}:{missed}"
-                        if key not in history:
-                            dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                            history[key] = {
-                                "wallet": wallet_address,
-                                "node": node_name,
-                                "cycle": cycle_num,
-                                "missed": missed,
-                                "detected_at": int(time.time()),
-                                "datetime": dt
-                            }
-                            save_history(history)
-                            message = (
-                                f"❌ <b>Bloc manqué détecté</b>\n"
-                                f"👛 Wallet: <code>{wallet_address}</code>\n"
-                                f"🏠 Node: <b>{node_name}</b>\n"
-                                f"🌀 Cycle: <b>{cycle_num}</b>\n"
-                                f"⛔ Total manqués ce cycle: <b>{missed}</b>\n"
-                                f"🕒 {dt}\n"
-                                f"🗂 Ajouté à l'historique."
-                            )
-                            await send_alert(
-                                alert_type="wallet_block_miss",
-                                node=node_name,
-                                wallet=wallet_address,
-                                level="warning",
-                                html=message
-                            )
-                            logger.warning(f"[MISSED_BLOCK] New missed block: {key} ({dt})")
-
+        await save_json_history(history)
         await asyncio.sleep(polling_interval)

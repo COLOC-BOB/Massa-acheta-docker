@@ -1,125 +1,208 @@
+# massa_acheta_docker/watchers/operations.py
+
 import asyncio
 import json
 import os
 import time
 from datetime import datetime
 from loguru import logger
+
 from remotes_utils import pull_http_api
 import app_globals
 from alert_manager import send_alert
+from watcher_utils import load_json_watcher, save_json_watcher
+from watchers.watchers_control import is_watcher_enabled
 
 WATCH_FILE = "watchers_state/operations_seen.json"
 
-def load_history():
-    if os.path.exists(WATCH_FILE):
-        try:
-            with open(WATCH_FILE, "rt") as f:
-                return json.load(f)
-        except Exception as e:
-            logger.error(f"Could not load operations history: {e}")
-    return {}
+def log_short_ops(wallet_address, ops, label="created_operations", preview=10):
+    n = len(ops)
+    if n == 0:
+        logger.debug(f"{wallet_address} {label}: [aucune opération]")
+    else:
+        short_list = ops[:preview] + (["..."] if n > preview else [])
+        logger.debug(f"{wallet_address} {label} (total {n}): {short_list}")
 
-def save_history(history):
-    with open(WATCH_FILE, "wt") as f:
-        json.dump(history, f, indent=2)
-
-async def get_operation_details(node_url, op_id):
+async def get_operation_details(op_id, node_url):
+    payload = {
+        "jsonrpc": "2.0",
+        "method": "get_operations",
+        "params": [[op_id]],
+        "id": 0
+    }
     try:
         resp = await pull_http_api(
             api_url=node_url,
             api_method="POST",
-            api_payload=json.dumps({
-                "jsonrpc": "2.0",
-                "method": "get_operations",
-                "params": [[op_id]],
-                "id": 0
-            }),
+            api_payload=payload,
             api_content_type="application/json"
         )
-        result = resp.get("result")
-        if result and isinstance(result, list) and len(result) > 0:
-            return result[0]
+        # Le résultat de l'API peut varier : dict avec clé "result", ou liste brute
+        op_list = None
+        if "result" in resp and isinstance(resp["result"], dict) and "result" in resp["result"]:
+            op_list = resp["result"]["result"]
+        elif "result" in resp and isinstance(resp["result"], list):
+            op_list = resp["result"]
         else:
-            logger.warning(f"Operation {op_id} not found on node {node_url}")
-            return None
+            op_list = []
+        if op_list and len(op_list) > 0:
+            return op_list[0]
     except Exception as e:
-        logger.error(f"Error fetching operation details for {op_id}: {e}")
-        return None
+        logger.error(f"[OPERATIONS] Erreur lors de la récupération du détail op {op_id}: {e}")
+    return None
+
+def format_operation_details(op_detail):
+    if not op_detail:
+        return "<i>Détail non disponible</i>"
+
+    op_status = op_detail.get("op_exec_status", "unknown")
+    op_obj = op_detail.get("operation", {})
+    op_content = op_obj.get("content", {})    # <<<<<< Correctif majeur ici !
+    fee = op_content.get("fee", "-")
+    expire_period = op_content.get("expire_period", "-")
+    op_types = op_content.get("op", {})       # <<<<<< Et ici
+
+    logger.debug(f"[WATCHER] op_types: {op_types}")
+    logger.debug(f"[WATCHER] Operation details raw: {json.dumps(op_detail, indent=2, ensure_ascii=False)}")
+    logger.debug(f"[WATCHER] op_obj: {json.dumps(op_obj, indent=2, ensure_ascii=False)}")
+    logger.debug(f"[WATCHER] content: {json.dumps(op_content, indent=2, ensure_ascii=False)}")
+
+    if "Transaction" in op_types:
+        op_type = "Transaction"
+        tx = op_types["Transaction"]
+        to_addr = tx.get("recipient_address", "-")
+        amount = tx.get("amount", "-")
+        return (
+            f"\n💸 <b>Transaction</b>"
+            f"\n➡️ Vers: <code>{to_addr}</code>"
+            f"\n💰 Montant: <b>{amount}</b> MAS"
+            f"\n🪙 Fee: <b>{fee}</b> MAS"
+            f"\n⏳ Statut: <b>{op_status}</b>"
+        )
+    elif "RollBuy" in op_types:
+        op_type = "RollBuy"
+        count = op_types["RollBuy"].get("roll_count", "-")
+        return (
+            f"\n🎲 <b>Achat de rolls</b>"
+            f"\n🔢 Quantité: <b>{count}</b>"
+            f"\n🪙 Fee: <b>{fee}</b> MAS"
+            f"\n⏳ Statut: <b>{op_status}</b>"
+        )
+    elif "RollSell" in op_types:
+        op_type = "RollSell"
+        count = op_types["RollSell"].get("roll_count", "-")
+        return (
+            f"\n💸 <b>Vente de rolls</b>"
+            f"\n🔢 Quantité: <b>{count}</b>"
+            f"\n🪙 Fee: <b>{fee}</b> MAS"
+            f"\n⏳ Statut: <b>{op_status}</b>"
+        )
+    elif "ExecuteSC" in op_types:
+        op_type = "ExecuteSC"
+        sc = op_types["ExecuteSC"]
+        max_gas = sc.get("max_gas", "-")
+        coins = sc.get("coins", "-")
+        data = sc.get("data", "-")
+        return (
+            f"\n📜 <b>Déploiement/Exécution SC</b>"
+            f"\n🪙 Coins: <b>{coins}</b> MAS"
+            f"\n⛽ Max Gas: <b>{max_gas}</b>"
+            f"\n📦 Données: <code>{data}</code>"
+            f"\n🪙 Fee: <b>{fee}</b> MAS"
+            f"\n⏳ Statut: <b>{op_status}</b>"
+        )
+    elif "CallSC" in op_types:
+        op_type = "CallSC"
+        call = op_types["CallSC"]
+        target_addr = call.get("target_addr", "-")
+        target_func = call.get("target_func", "-")
+        param = call.get("param", "-")
+        max_gas = call.get("max_gas", "-")
+        coins = call.get("coins", "-")
+        return (
+            f"\n📞 <b>Appel de SC</b>"
+            f"\n🎯 SC: <code>{target_addr}</code>"
+            f"\n🛠 Fonction: <b>{target_func}</b>"
+            f"\n🪙 Coins: <b>{coins}</b> MAS"
+            f"\n⛽ Max Gas: <b>{max_gas}</b>"
+            f"\n🪙 Fee: <b>{fee}</b> MAS"
+            f"\n⏳ Statut: <b>{op_status}</b>"
+        )
+    else:
+        return (
+            f"\n🔎 <b>Type inconnu</b> : <code>{op_types}</code>"
+            f"\n🪙 Fee: <b>{fee}</b> MAS"
+            f"\n⏳ Statut: <b>{op_status}</b>"
+        )
 
 async def watch_operations(polling_interval=30):
-    logger.info("Watcher: operations started")
-    history = load_history()
+    try:
+        previous_ops = load_json_watcher(WATCH_FILE, {})
+    except Exception as e:
+        logger.error(f"Erreur chargement {WATCH_FILE} : {e}")
+        previous_ops = {}
 
+    logger.info("[OPERATIONS] Watcher: operations started")
     while True:
+        if not is_watcher_enabled("operations"):
+            logger.info("[OPERATIONS] Désactivé, je dors...")
+            await asyncio.sleep(60)
+            continue
+
         for node_name, node_data in app_globals.app_results.items():
+            node_url = node_data.get("url") or app_globals.app_config["service"]["mainnet_rpc_url"]
             for wallet_address in node_data.get("wallets", {}):
+                logger.debug(f"Checking wallet {wallet_address} on node {node_name}")
                 try:
+                    payload = {
+                        "jsonrpc": "2.0",
+                        "method": "get_addresses",
+                        "params": [[wallet_address]],
+                        "id": 0
+                    }
                     resp = await pull_http_api(
-                        api_url=app_globals.app_config['service']['mainnet_rpc_url'],
+                        api_url=node_url,
                         api_method="POST",
-                        api_payload=json.dumps({
-                            "jsonrpc": "2.0",
-                            "method": "get_addresses",
-                            "params": [[wallet_address]],
-                            "id": 0
-                        }),
+                        api_payload=payload,
                         api_content_type="application/json"
                     )
-                    result = resp.get("result")
-                    if not result or not isinstance(result, list):
-                        continue
-                    created_ops = result[0].get("created_operations", [])
                 except Exception as e:
-                    logger.error(f"Error fetching wallet {wallet_address}: {e}")
+                    logger.warning(f"API error for {wallet_address}@{node_name}: {e}")
                     continue
 
-                # Pour chaque opération créée
-                for op_id in created_ops:
-                    if op_id not in history:
-                        dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        op_details = await get_operation_details(app_globals.app_config['service']['mainnet_rpc_url'], op_id)
-                        history[op_id] = {
-                            "wallet": wallet_address,
-                            "node": node_name,
-                            "op_id": op_id,
-                            "detected_at": int(time.time()),
-                            "datetime": dt,
-                            "details": op_details
-                        }
-                        save_history(history)
+                # Compatibilité: API peut répondre .result.result ou .result
+                result = resp.get("result", {}).get("result") if isinstance(resp.get("result", {}), dict) else resp.get("result")
+                if not result or not isinstance(result, list) or not result[0]:
+                    logger.debug(f"{wallet_address}: résultat API inexploitable")
+                    continue
+                if "created_operations" not in result[0]:
+                    logger.debug(f"{wallet_address}: champ 'created_operations' absent dans la réponse")
+                    continue
+                created_ops = result[0]["created_operations"]
+                log_short_ops(wallet_address, created_ops, label="created_operations")
 
-                        # Construction du message
+                old_ops = previous_ops.get(wallet_address, [])
+                log_short_ops(wallet_address, old_ops, label="old_operations")
+                new_ops = [o for o in created_ops if o not in old_ops]
+                log_short_ops(wallet_address, new_ops, label="new_operations")
+
+                if not created_ops or len(created_ops) == 0:
+                    logger.warning(f"{wallet_address}@{node_name}: Pas d'opérations créées (created_operations vide). Peut-être une limitation du node public.")
+                    continue
+
+                if new_ops:
+                    for op_id in new_ops:
+                        op_detail = await get_operation_details(op_id, node_url)
+                        dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         message = (
                             f"📨 <b>Nouvelle opération créée</b>\n"
                             f"👛 Wallet: <code>{wallet_address}</code>\n"
                             f"🏠 Node: <b>{node_name}</b>\n"
                             f"🆔 Opération: <code>{op_id}</code>\n"
                             f"🕒 {dt}\n"
+                            f"{format_operation_details(op_detail)}\n"
+                            f"🗂 Ajoutée à l'historique."
                         )
-                        # Ajoute les détails si disponibles
-                        if op_details:
-                            op_type = op_details.get("operation", {}).get("type", "unknown")
-                            op_status = op_details.get("status", "unknown")
-                            op_fee = op_details.get("operation", {}).get("fee", "-")
-                            # Transaction classique :
-                            if op_type == "Transaction":
-                                to_addr = op_details.get("operation", {}).get("content", {}).get("recipient_address", "-")
-                                amount = op_details.get("operation", {}).get("content", {}).get("amount", "-")
-                                message += (
-                                    f"\n💸 Type: {op_type}"
-                                    f"\n➡️ To: <code>{to_addr}</code>"
-                                    f"\n💰 Amount: <b>{amount}</b> MAS"
-                                    f"\n🪙 Fee: <b>{op_fee}</b> MAS"
-                                    f"\n⏳ Status: <b>{op_status}</b>"
-                                )
-                            else:
-                                message += (
-                                    f"\n🔎 Type: {op_type}"
-                                    f"\n🪙 Fee: <b>{op_fee}</b> MAS"
-                                    f"\n⏳ Status: <b>{op_status}</b>"
-                                )
-
-                        message += "\n🗂 Ajoutée à l'historique."
                         await send_alert(
                             alert_type="operation_created",
                             node=node_name,
@@ -127,6 +210,13 @@ async def watch_operations(polling_interval=30):
                             level="info",
                             html=message
                         )
-                        logger.info(f"[OPERATION] New operation: {op_id} ({dt})")
+                        logger.success(f"[OPERATIONS] Nouvelle opération: {op_id} ({dt})")
+
+                    previous_ops[wallet_address] = created_ops
+                    try:
+                        save_json_watcher(WATCH_FILE, previous_ops)
+                        logger.info(f"{WATCH_FILE} mis à jour pour {wallet_address} ({len(created_ops)} opérations connues)")
+                    except Exception as e:
+                        logger.error(f"Erreur sauvegarde {WATCH_FILE}: {e}")
 
         await asyncio.sleep(polling_interval)

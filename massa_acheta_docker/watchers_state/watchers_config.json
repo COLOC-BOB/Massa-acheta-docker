@@ -1,6 +1,8 @@
 {
   "rolls": true,
-  "blocks": false,
+  "blocks": true,
   "balance": true,
-  "heartbeat": true
+  "operations": true,
+  "deferred_credits": true,
+  "missed_blocks": true
 }

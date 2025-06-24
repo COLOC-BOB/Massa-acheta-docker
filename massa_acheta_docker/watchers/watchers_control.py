@@ -6,7 +6,9 @@ DEFAULTS = {
     "rolls": True,
     "blocks": True,
     "balance": True,  
-    "heartbeat": True
+    "operations": True,
+    "deferred_credits": True,
+    "missed_blocks": True
 }
 
 def load_watchers_config():

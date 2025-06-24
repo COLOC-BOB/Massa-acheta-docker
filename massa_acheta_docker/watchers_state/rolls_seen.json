@@ -1,4 +1,1316 @@
 {
-  "My node": {},
-  "Mainnet-public": {}
+  "My node": {
+    "AU12eU7k2YSBNX7maKB8kzzvHfdfdr8YKSG2Bv9nUg9HRFvpsaS79": [
+      {
+        "datetime": "2025-06-24T22:14:10",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:14:42",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:15:14",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:15:45",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:16:16",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:16:48",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:17:19",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:17:51",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:18:23",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:18:54",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:19:25",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:19:56",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:20:49",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:21:20",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:21:52",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:22:24",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:22:55",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:23:27",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:23:59",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:24:30",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:25:02",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:25:34",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:26:06",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:26:38",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:27:09",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:27:41",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:28:13",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:28:45",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:29:16",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:29:48",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:30:19",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:30:51",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:31:23",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:31:54",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:32:26",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:32:57",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:33:28",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:33:59",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:34:31",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:35:02",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:35:34",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:36:05",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:36:37",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:37:09",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:37:40",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:38:12",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:38:44",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:39:03",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:39:34",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:40:06",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:40:38",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      },
+      {
+        "datetime": "2025-06-24T22:41:09",
+        "active_rolls": 33,
+        "candidate_rolls": 33
+      }
+    ]
+  },
+  "Mainnet-public": {
+    "AU16raXifo3FExijWrhUBLBneaHnWGicWbShgyXgAKB1bnj1yLvH": [
+      {
+        "datetime": "2025-06-24T22:14:11",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:14:42",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:15:14",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:15:45",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:16:16",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:16:48",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:17:19",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:17:52",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:18:23",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:18:54",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:19:25",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:19:57",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:20:49",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:21:21",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:21:53",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:22:24",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:22:56",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:23:27",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:23:59",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:24:30",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:25:02",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:25:35",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:26:06",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:26:38",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:27:10",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:27:41",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:28:13",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:28:45",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:29:17",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:29:48",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:30:20",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:30:52",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:31:23",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:31:54",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:32:26",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:32:57",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:33:28",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:34:00",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:34:31",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:35:03",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:35:34",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:36:06",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:36:37",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:37:09",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:37:41",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:38:13",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:38:44",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:39:03",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:39:34",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:40:06",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:40:38",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:41:09",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      }
+    ],
+    "AU122Em8qkqegdLb1eyH8rdkSCNEf7RZLeTJve4Q2inRPGiTJ2xNv": [
+      {
+        "datetime": "2025-06-24T22:14:11",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:14:43",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:15:14",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:15:46",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:16:17",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:16:49",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:17:20",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:17:52",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:18:23",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:18:54",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:19:26",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:19:57",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:20:49",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:21:21",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:21:53",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:22:24",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:22:56",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:23:28",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:23:59",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:24:31",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:25:03",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:25:35",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:26:07",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:26:39",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:27:10",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:27:42",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:28:14",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:28:45",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:29:17",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:29:49",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:30:20",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:30:52",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:31:23",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:31:54",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:32:26",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:32:57",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:33:29",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:34:00",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:34:31",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:35:03",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:35:35",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:36:06",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:36:38",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:37:10",
+        "active_rolls": 86686,
+        "candidate_rolls": 86686
+      },
+      {
+        "datetime": "2025-06-24T22:37:41",
+        "active_rolls": 86686,
+        "candidate_rolls": 86687
+      },
+      {
+        "datetime": "2025-06-24T22:38:13",
+        "active_rolls": 86687,
+        "candidate_rolls": 86687
+      },
+      {
+        "datetime": "2025-06-24T22:38:44",
+        "active_rolls": 86687,
+        "candidate_rolls": 86687
+      },
+      {
+        "datetime": "2025-06-24T22:39:03",
+        "active_rolls": 86687,
+        "candidate_rolls": 86687
+      },
+      {
+        "datetime": "2025-06-24T22:39:35",
+        "active_rolls": 86687,
+        "candidate_rolls": 86687
+      },
+      {
+        "datetime": "2025-06-24T22:40:07",
+        "active_rolls": 86687,
+        "candidate_rolls": 86687
+      },
+      {
+        "datetime": "2025-06-24T22:40:38",
+        "active_rolls": 86687,
+        "candidate_rolls": 86687
+      },
+      {
+        "datetime": "2025-06-24T22:41:09",
+        "active_rolls": 86687,
+        "candidate_rolls": 86687
+      }
+    ],
+    "AU144mAyhGCFtNuVyCqdYAund9PZW5wibXihSHN3TZZ31dpGsNfE": [
+      {
+        "datetime": "2025-06-24T22:14:12",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:14:43",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:15:15",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:15:46",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:16:17",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:16:49",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:17:20",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:17:53",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:18:24",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:18:55",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:19:26",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:19:57",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:20:50",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:21:22",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:21:53",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:22:25",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:22:56",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:23:28",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:24:00",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:24:31",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:25:03",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:25:35",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:26:07",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:26:39",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:27:10",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:27:42",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:28:14",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:28:46",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:29:18",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:29:49",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:30:21",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:30:52",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:31:23",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:31:55",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:32:27",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:32:58",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:33:29",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:34:00",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:34:32",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:35:03",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:35:35",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:36:07",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:36:38",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:37:10",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:37:42",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:38:14",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:38:45",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:39:04",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:39:35",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:40:07",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:40:38",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      },
+      {
+        "datetime": "2025-06-24T22:41:10",
+        "active_rolls": 0,
+        "candidate_rolls": 0
+      }
+    ],
+    "AU1jmrHhqzW6GCxdM3K9tqktrkCESJJxsWWC9kM5F5KDS751Tt8B": [
+      {
+        "datetime": "2025-06-24T22:14:12",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:14:43",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:15:15",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:15:46",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:16:17",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:16:49",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:17:21",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:17:53",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:18:24",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:18:55",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:19:26",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:19:58",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:20:50",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:21:22",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:21:54",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:22:25",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:22:57",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:23:29",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:24:00",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:24:32",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:25:04",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:25:36",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:26:08",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:26:39",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:27:11",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:27:42",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:28:15",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:28:46",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:29:18",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:29:49",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:30:21",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:30:53",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:31:24",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:31:55",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:32:27",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:32:58",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:33:29",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:34:01",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:34:32",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:35:04",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:35:35",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:36:07",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:36:39",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:37:10",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:37:42",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:38:14",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:38:46",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:39:04",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:39:36",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:40:07",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:40:39",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      },
+      {
+        "datetime": "2025-06-24T22:41:10",
+        "active_rolls": 1,
+        "candidate_rolls": 1
+      }
+    ]
+  }
 }

@@ -1,38 +1,63 @@
 # massa_acheta_docker/watchers/balance.py
+
 import asyncio
 import json
 import os
-import time
 from datetime import datetime
 from loguru import logger
 from remotes_utils import pull_http_api
 import app_globals
 from alert_manager import send_alert
 
-WATCH_FILE = "watchers_state/balance_seen.json"
+WATCH_FILE = "watchers_state/balances_seen.json"
+_save_lock = asyncio.Lock()
 
-def load_history():
+def load_json_history():
     if os.path.exists(WATCH_FILE):
         try:
             with open(WATCH_FILE, "rt") as f:
                 return json.load(f)
         except Exception as e:
-            logger.error(f"Could not load balance history: {e}")
+            logger.error(f"Could not load balance watcher state: {e}")
     return {}
 
-def save_history(history):
-    with open(WATCH_FILE, "wt") as f:
-        json.dump(history, f, indent=2)
+async def save_json_history(history):
+    async with _save_lock:
+        tmp_file = WATCH_FILE + ".tmp"
+        try:
+            with open(tmp_file, "wt") as f:
+                json.dump(history, f, indent=2, ensure_ascii=False)
+            os.replace(tmp_file, WATCH_FILE)
+        except Exception as e:
+            logger.error(f"Could not save balance watcher state: {e}")
 
 async def watch_balance(polling_interval=30):
-    logger.info("Watcher: balance started")
-    history = load_history()
+    logger.info("[BALANCE] JSON Watcher started")
+    # Structure :
+    # {
+    #   "My node": {
+    #     "AU12xxx...": [
+    #         {"datetime": "...", "balance": ...},
+    #         ...
+    #     ],
+    #     ...
+    #   },
+    #   ...
+    # }
+    history = load_json_history()
     if not isinstance(history, dict):
         history = {}
 
     while True:
         for node_name, node_data in app_globals.app_results.items():
-            for wallet_address in node_data.get("wallets", {}):
+            wallets = node_data.get("wallets", {})
+            if not wallets:
+                continue
+
+            if node_name not in history:
+                history[node_name] = {}
+
+            for wallet_address in wallets:
                 try:
                     resp = await pull_http_api(
                         api_url=node_data['url'],
@@ -45,24 +70,39 @@ async def watch_balance(polling_interval=30):
                         }),
                         api_content_type="application/json"
                     )
-                    result = resp.get("result")
-                    if not result or not isinstance(result, list):
+
+                    # Correction ici !
+                    if (
+                        not resp or
+                        "result" not in resp or
+                        "result" not in resp["result"] or
+                        not isinstance(resp["result"]["result"], list) or
+                        not resp["result"]["result"]
+                    ):
                         continue
 
-                    addr_data = result[0]
+                    addr_data = resp["result"]["result"][0]
                     final_balance = float(addr_data.get("final_balance", 0))
-                    prev_balance = float(history.get(wallet_address, {}).get("final_balance", 0))
 
-                    if prev_balance != 0 and final_balance != prev_balance:
-                        dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        delta = final_balance - prev_balance
+
+                    # Init de la liste d'observations
+                    if wallet_address not in history[node_name]:
+                        history[node_name][wallet_address] = []
+
+                    wallet_history = history[node_name][wallet_address]
+                    prev = wallet_history[-1] if wallet_history else None
+
+                    # Détection du changement de balance
+                    if prev and final_balance != prev["balance"]:
+                        now_iso = datetime.now().isoformat()
+                        delta = final_balance - prev["balance"]
                         direction = "Hausse" if delta > 0 else "Baisse"
                         emoji = "🟢" if delta > 0 else "🔴"
                         message = (
                             f"{emoji} <b>Changement de balance détecté</b>\n"
                             f"👛 Wallet: <code>{wallet_address}</code>\n"
                             f"🏠 Node: <b>{node_name}</b>\n"
-                            f"🗓 {dt}\n"
+                            f"🗓 {now_iso}\n"
                             f"💸 {direction} de <b>{abs(delta):,.4f} MAS</b>\n"
                             f"💰 Nouveau solde : <b>{final_balance:,.4f} MAS</b>"
                         )
@@ -73,16 +113,17 @@ async def watch_balance(polling_interval=30):
                             level="info",
                             html=message
                         )
-                        logger.info(f"[BALANCE] Change for {wallet_address}: {prev_balance} -> {final_balance}")
+                        logger.info(f"[BALANCE] Change for {wallet_address}@{node_name}: {prev['balance']} -> {final_balance}")
 
-                    # Toujours enregistrer l'état courant
-                    history[wallet_address] = {
-                        "final_balance": final_balance,
-                        "last_update": int(time.time())
+                    # Ajoute à l'historique (toujours)
+                    entry = {
+                        "datetime": datetime.now().isoformat(),
+                        "balance": final_balance
                     }
-                    save_history(history)
+                    history[node_name][wallet_address].append(entry)
 
                 except Exception as e:
-                    logger.error(f"Error processing balance for {wallet_address}: {e}")
+                    logger.error(f"[BALANCE] Error processing balance for {wallet_address}@{node_name}: {e}")
 
+        await save_json_history(history)
         await asyncio.sleep(polling_interval)

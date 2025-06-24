@@ -147,7 +147,8 @@ async def delete_wallet(message: Message, state: FSMContext) -> None:
                 "👉 You can check new settings using /view_config command"
             ),
             parse_mode="HTML",
-            reply_markup=kb_wallets(node_name=node_name),
-            request_timeout=app_config['telegram']['sending_timeout_sec']
+            reply_markup=build_menu_keyboard(),
+            request_timeout=app_config['telegram']['sending_timeout_sec'],
+            disable_web_page_preview=True
         )
     await state.clear()
