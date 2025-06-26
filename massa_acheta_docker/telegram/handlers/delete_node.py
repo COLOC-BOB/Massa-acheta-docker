@@ -21,7 +21,7 @@ router = Router()
 @router.message(Command("delete_node"))
 @logger.catch
 async def cmd_delete_node(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_delete_node")
+    logger.debug(f"[DELETE_NODE] -> cmd_delete_node")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -45,7 +45,7 @@ async def cmd_delete_node(message: Message, state: FSMContext) -> None:
 @router.message(NodeRemover.waiting_node_name, F.text)
 @logger.catch
 async def delete_node(message: Message, state: FSMContext) -> None:
-    logger.debug("-> delete_node")
+    logger.debug(f"[DELETE_NODE] -> delete_node")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -66,7 +66,7 @@ async def delete_node(message: Message, state: FSMContext) -> None:
             app_globals.app_results.pop(node_name, None)
             save_app_results()
     except Exception as E:
-        logger.error(f"Cannot remove node '{node_name}': ({str(E)})")
+        logger.error(f"[DELETE_NODE] Cannot remove node '{node_name}': ({str(E)})")
         short_name = await get_short_address(node_name)
         await message.reply(
             text=(
@@ -79,7 +79,7 @@ async def delete_node(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     else:
-        logger.info(f"Successfully removed node '{node_name}'")
+        logger.info(f"[DELETE_NODE] Successfully removed node '{node_name}'")
         short_name = await get_short_address(node_name)
         await message.reply(
             text=(

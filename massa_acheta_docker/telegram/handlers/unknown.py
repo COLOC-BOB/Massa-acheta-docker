@@ -14,7 +14,7 @@ router = Router()
 @router.message(F)
 @logger.catch
 async def cmd_unknown(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_unknown")
+    logger.debug(f"[UNKNOWN] -> cmd_unknown")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -32,6 +32,6 @@ async def cmd_unknown(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send unknown command message: {e}")
+        logger.error(f"[UNKNOWN] Could not send unknown command message: {e}")
 
     await state.clear()

@@ -15,7 +15,7 @@ from remotes.node import format_html_message
 
 @logger.catch
 async def monitor() -> None:
-    logger.debug("-> Monitor")
+    logger.debug(f"[MONITOR] -> Monitor")
     try:
         while True:
             # 1. Rafraîchir le statut réseau AVANT tout le reste !
@@ -50,7 +50,7 @@ async def monitor() -> None:
             # 6. Log et alerte si besoin
             nb_nodes = len(node_coros)
             nb_wallets = len(wallet_coros)
-            logger.info(f"Monitor: {nb_nodes} nodes, {nb_wallets} wallets checked.")
+            logger.info(f"[MONITOR] Monitor: {nb_nodes} nodes, {nb_wallets} wallets checked.")
 
             all_nodes_offline = all(
                 not app_globals.app_results[n]['last_status']
@@ -65,13 +65,13 @@ async def monitor() -> None:
                 )
 
 
-            logger.info(f"Sleeping for {app_config['service']['main_loop_period_min']} minutes...")
+            logger.info(f"[MONITOR] Sleeping for {app_config['service']['main_loop_period_min']} minutes...")
             await asyncio.sleep(app_config['service']['main_loop_period_min'] * 60)
 
     except BaseException as E:
-        logger.error(f"Exception {str(E)} ({E})")
+        logger.error(f"[MONITOR] Exception {str(E)} ({E})")
     finally:
-        logger.error("<- Quit Monitor")
+        logger.error(f"[MONITOR] <- Quit Monitor")
     return
 
 

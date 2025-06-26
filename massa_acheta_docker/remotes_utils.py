@@ -20,7 +20,7 @@ async def pull_http_api(api_url: str=None,
                         api_session_timeout: int=app_config['service']['http_session_timeout_sec'],
                         api_probe_timeout: int=app_config['service']['http_probe_timeout_sec']) -> object:
 
-    logger.debug(f"-> pull_http_api")
+    logger.debug(f"[REMOTES] -> pull_http_api")
 
     api_session_timeout = aiohttp.ClientTimeout(total=api_session_timeout)
     api_probe_timeout = aiohttp.ClientTimeout(total=api_probe_timeout)
@@ -76,20 +76,20 @@ async def pull_http_api(api_url: str=None,
 
     except BaseException as E:
         logger.error(
-            f"Exception in remote HTTP API request for URL '{api_url}': {repr(E)}\n"
+            f"[REMOTES] Exception in remote HTTP API request for URL '{api_url}': {repr(E)}\n"
             f"{traceback.format_exc()}"
         )
         api_result = {"error": f"{repr(E)} | {traceback.format_exc()}"}
 
     else:
-        logger.info(f"Successfully pulled from remote HTTP API '{api_url}'")
+        logger.info(f"[REMOTES] Successfully pulled from remote HTTP API '{api_url}'")
 
     finally:
         return api_result
 
 @logger.catch
 def save_app_results() -> bool:
-    logger.debug(f"-> save_app_results")
+    logger.debug(f"[REMOTES] -> save_app_results")
 
     composed_results = {}
 
@@ -135,16 +135,16 @@ def save_app_results() -> bool:
             output_results.flush()
                     
     except BaseException as E:
-        logger.error(f"Cannot save app_results into '{app_results_obj}' file: ({str(E)})")
+        logger.error(f"[REMOTES] Cannot save app_results into '{app_results_obj}' file: ({str(E)})")
         return False
         
     else:
-        logger.info(f"Successfully saved app_results into '{app_results_obj}' file!")
+        logger.info(f"[REMOTES] Successfully saved app_results into '{app_results_obj}' file!")
         return True
 
 @logger.catch
 def save_app_stat() -> bool:
-    logger.debug(f"-> save_app_stat")
+    logger.debug(f"[REMOTES] -> save_app_stat")
 
     composed_results = {
         "app_results": {},
@@ -174,21 +174,21 @@ def save_app_stat() -> bool:
             output_stat.flush()
                     
     except BaseException as E:
-        logger.error(f"Cannot save app_stat into '{app_stat_obj}' file: ({str(E)})")
+        logger.error(f"[REMOTES] Cannot save app_stat into '{app_stat_obj}' file: ({str(E)})")
         return False
         
     else:
-        logger.info(f"Successfully saved app_stat into '{app_stat_obj}' file!")
+        logger.info(f"[REMOTES] Successfully saved app_stat into '{app_stat_obj}' file!")
         return True
 
 @logger.catch
 async def t_now() -> int:
-    logger.debug("-> t_now")
+    logger.debug(f"[REMOTES] -> t_now")
     return int(time())
 
 @logger.catch
 async def get_last_seen(last_time: int=0, show_days: bool=False) -> str:
-    logger.debug("-> get_last_seen")
+    logger.debug(f"[REMOTES] -> get_last_seen")
     if last_time == 0:
         return "Never"
     
@@ -209,7 +209,7 @@ async def get_last_seen(last_time: int=0, show_days: bool=False) -> str:
 
 @logger.catch
 async def get_duration(start_time: int=0, show_days: bool=False) -> str:
-    logger.debug("-> get_duration")
+    logger.debug(f"[REMOTES] -> get_duration")
     if start_time == 0:
         return "unknown"
 
@@ -230,7 +230,7 @@ async def get_duration(start_time: int=0, show_days: bool=False) -> str:
 
 @logger.catch
 async def get_short_address(address: str="") -> str:
-    logger.debug("-> get_short_address")
+    logger.debug(f"[REMOTES] -> get_short_address")
     if len(address) > 16:
         return f"{address[0:8]}...{address[-6:]}"
     else:
@@ -244,7 +244,7 @@ async def get_rewards_mas_day(rolls_number=100, total_rolls=0):
     block_reward = app_globals.massa_network['values'].get('block_reward', None)
 
     if not t0_ms or not threads_num or not block_reward:
-        logger.debug(f"Paramètre manquant: t0_ms={t0_ms}, threads_num={threads_num}, block_reward={block_reward}")
+        logger.debug(f"[REMOTES] Paramètre manquant: t0_ms={t0_ms}, threads_num={threads_num}, block_reward={block_reward}")
         return 0  # paramètres manquants
 
     t0_sec = int(t0_ms) / 1_000
@@ -254,7 +254,7 @@ async def get_rewards_mas_day(rolls_number=100, total_rolls=0):
     if total_rolls == 0:
         total_rolls = app_globals.massa_network['values'].get('total_staked_rolls', 0)
 
-    logger.debug(f"RÉSUMÉ CALCUL: rolls_number={rolls_number}, total_rolls={total_rolls}, block_reward={block_reward}, t0_sec={t0_sec}, threads_num={threads_num}, blocks_per_day={blocks_per_day}")
+    logger.debug(f"[REMOTES] RÉSUMÉ CALCUL: rolls_number={rolls_number}, total_rolls={total_rolls}, block_reward={block_reward}, t0_sec={t0_sec}, threads_num={threads_num}, blocks_per_day={blocks_per_day}")
 
     if total_rolls == 0 or rolls_number == 0 or blocks_per_day == 0:
         my_reward = 0
@@ -262,7 +262,7 @@ async def get_rewards_mas_day(rolls_number=100, total_rolls=0):
         my_blocks = blocks_per_day * (rolls_number / total_rolls)
         my_reward = my_blocks * block_reward
 
-    logger.debug(f"Récompense journalière estimée: {my_reward} MAS")
+    logger.debug(f"[REMOTES] Récompense journalière estimée: {my_reward} MAS")
     return int(my_reward)
 
 
@@ -270,7 +270,7 @@ async def get_rewards_mas_day(rolls_number=100, total_rolls=0):
 
 @logger.catch
 async def get_rewards_blocks_cycle(rolls_number: int=0, total_rolls: int=0) -> float:
-    logger.debug("-> get_rewards_blocks_cycle")
+    logger.debug(f"[REMOTES] -> get_rewards_blocks_cycle")
 
     threads_num = app_globals.massa_config.get("thread_count", None)
     if threads_num:
@@ -306,7 +306,7 @@ async def get_rewards_blocks_cycle(rolls_number: int=0, total_rolls: int=0) -> f
             )
     
     except BaseException as E:
-        logger.error(f"Cannot compute 'rewards_blocks_cycle' ({str(E)})")
+        logger.error(f"[REMOTES] Cannot compute 'rewards_blocks_cycle' ({str(E)})")
         my_blocks = 0.0
 
     return my_blocks
@@ -342,7 +342,7 @@ def update_deferred_credits_from_node():
             response.raise_for_status()
             result = response.json()
             if "error" in result:
-                logger.error(f"Erreur RPC pour {addr}: {result['error']}")
+                logger.error(f"[REMOTES] Erreur RPC pour {addr}: {result['error']}")
                 all_credits[addr] = []
             else:
                 raw_credits = result['result'][0].get('deferred_credits', [])
@@ -358,16 +358,16 @@ def update_deferred_credits_from_node():
                 else:
                     all_credits[addr] = raw_credits
         except Exception as e:
-            logger.error(f"Exception pour {addr}: {e}")
+            logger.error(f"[REMOTES] Exception pour {addr}: {e}")
             all_credits[addr] = []
 
     # Sauvegarde le fichier au format attendu
     try:
         with open(OUTPUT_PATH, "w") as f:
             json.dump(all_credits, f, indent=4)
-        logger.info(f"✅ deferred_credits.json mis à jour avec {len(all_credits)} wallet(s) !")
+        logger.info(f"[REMOTES] ✅ deferred_credits.json mis à jour avec {len(all_credits)} wallet(s) !")
     except Exception as e:
-        logger.error(f"Erreur lors de la sauvegarde du fichier {OUTPUT_PATH}: {e}")
+        logger.error(f"[REMOTES] Erreur lors de la sauvegarde du fichier {OUTPUT_PATH}: {e}")
 
 
 

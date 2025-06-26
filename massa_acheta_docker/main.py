@@ -52,10 +52,10 @@ from watchers.operations import watch_operations
 async def deferred_credits_auto_refresh_loop():
     while True:
         try:
-            logger.info("⏳ [AUTO] Refresh deferred_credits.json depuis le node Massa")
+            logger.info(f"[MAIN] Refresh deferred_credits.json depuis le node Massa")
             await asyncio.to_thread(update_deferred_credits_from_node)  # Si la fonction est sync ! Sinon : await update_deferred_credits_from_node()
         except Exception as e:
-            logger.error(f"[AUTO] Refresh deferred_credits error: {e}")
+            logger.error(f"[MAIN] Refresh deferred_credits error: {str(e)}")
         await asyncio.sleep(600)  # 10 minutes
 
 def format_start_message():
@@ -78,7 +78,7 @@ def format_start_message():
 
 @logger.catch
 async def main() -> None:
-    logger.debug("-> main")
+    logger.debug(f"[MAIN] -> main")
 
     # ----------- INSTANCIATION DU BOT & DU DISPATCHER ---------------
     tg_bot = Bot(
@@ -91,7 +91,7 @@ async def main() -> None:
     app_globals.tg_dp = tg_dp
     # ---------------------------------------------------------------
 
-    logger.info("Private menu applied.")
+    logger.info(f"[MAIN] Private menu applied.")
     await queue_telegram_message(message_text=format_start_message())
 
     try:
@@ -135,21 +135,21 @@ async def main() -> None:
         await tg_dp.start_polling(tg_bot)
 
     except BaseException as E:
-        logger.error(f"Exception {str(E)} ({E})")
+        logger.error(f"[MAIN] Exception {str(E)} ({E})")
     finally:
-        logger.error("<- Quit Def")
+        logger.error(f"[MAIN] <- Quit Def")
 
     return
 
 if __name__ == "__main__":
-    logger.info(f"MASSA Acheta started at {app_globals.acheta_start_time}")
+    logger.info(f"[MAIN] MASSA Acheta started at {app_globals.acheta_start_time}")
 
     try:
         asyncio.run(main())
     except BaseException as E:
-        logger.error(f"Exception {str(E)} ({E})")
+        logger.error(f"[MAIN] Exception {str(E)} ({E})")
     finally:
         save_app_results()
         save_app_stat()
-        logger.critical("Service terminated")
+        logger.critical(f"[MAIN] Service terminated")
         sys_exit()

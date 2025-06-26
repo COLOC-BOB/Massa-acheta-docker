@@ -15,8 +15,8 @@ router = Router()
 @router.message(StateFilter(None), Command("massa_info"))
 @logger.catch
 async def cmd_massa_info(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_massa_info")
-    logger.info(f"-> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
+    logger.debug(f"[MASSA_INFO] -> cmd_massa_info")
+    logger.info(f"[MASSA_INFO] -> Got '{message.text}' command from '{message.from_user.id}'@'{message.chat.id}'")
     
     # Limite l'usage à ton chat privé
     if message.chat.id != app_globals.ACHETA_CHAT:
@@ -46,4 +46,4 @@ async def cmd_massa_info(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(e)})")
+        logger.error(f"[MASSA_INFO] Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(e)})")

@@ -19,7 +19,7 @@ def load_json_history():
             with open(WATCH_FILE, "rt") as f:
                 return json.load(f)
         except Exception as e:
-            logger.error(f"Could not load missed blocks watcher state: {e}")
+            logger.error(f"[MISSED_BLOCK] Could not load missed blocks watcher state: {str(e)}")
     return {}
 
 async def save_json_history(history):
@@ -30,10 +30,10 @@ async def save_json_history(history):
                 json.dump(history, f, indent=2, ensure_ascii=False)
             os.replace(tmp_file, WATCH_FILE)
         except Exception as e:
-            logger.error(f"Could not save missed blocks watcher state: {e}")
+            logger.error(f"[MISSED_BLOCK] Could not save missed blocks watcher state: {str(e)}")
 
 async def watch_missed_blocks(polling_interval=30):
-    logger.info("[MISSED_BLOCK] JSON Watcher started")
+    logger.info(f"[MISSED_BLOCK] JSON Watcher started")
     # Structure :
     # {
     #   "My node": {
@@ -51,7 +51,7 @@ async def watch_missed_blocks(polling_interval=30):
 
     while True:
         if not is_watcher_enabled("missed_blocks"):
-            logger.info("[MISSED_BLOCK] Désactivé, je dors...")
+            logger.info(f"[MISSED_BLOCK] Désactivé, je dors...")
             await asyncio.sleep(60)
             continue
 

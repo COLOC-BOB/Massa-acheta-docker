@@ -37,7 +37,7 @@ async def operate_telegram_queue() -> None:
                 continue
 
             number_unsent_messages = len(app_globals.telegram_queue)
-            logger.debug(f"Telegram: {number_unsent_messages} unsent message(s) in queue")
+            logger.debug(f"[QUEUE] Telegram: {number_unsent_messages} unsent message(s) in queue")
 
             message = app_globals.telegram_queue[0]
             chat_id = message['chat_id']
@@ -52,15 +52,15 @@ async def operate_telegram_queue() -> None:
                     disable_web_page_preview=message['disable_web_page_preview']
                 )
             except Exception as e:
-                logger.error(f"Could not send telegram message to chat_id '{chat_id}': ({str(e)})")
+                logger.error(f"[QUEUE] Could not send telegram message to chat_id '{chat_id}': ({str(e)})")
             else:
-                logger.info(f"Successfully sent message to chat_id '{chat_id}' ({number_unsent_messages - 1} unsent message(s) in queue)")
+                logger.info(f"[QUEUE] Successfully sent message to chat_id '{chat_id}' ({number_unsent_messages - 1} unsent message(s) in queue)")
                 app_globals.telegram_queue.popleft()
 
     except Exception as e:
-        logger.error(f"Exception {str(e)} ({e})")
+        logger.error(f"[QUEUE] Exception {str(e)} ({e})")
     finally:
-        logger.error("<- Quit operate_telegram_queue")
+        logger.error(f"[QUEUE] <- Quit operate_telegram_queue")
 
     return
 

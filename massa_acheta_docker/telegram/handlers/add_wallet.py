@@ -26,7 +26,7 @@ router = Router()
 @router.message(Command("add_wallet"))
 @logger.catch
 async def cmd_add_wallet(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_add_wallet")
+    logger.debug(f"[ADD_WALLET] -> cmd_add_wallet")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -38,7 +38,7 @@ async def cmd_add_wallet(message: Message, state: FSMContext) -> None:
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except Exception as E:
-            logger.error(f"Could not send message: {E}")
+            logger.error(f"[ADD_WALLET] Could not send message: {E}")
         await state.clear()
         return
 
@@ -51,13 +51,13 @@ async def cmd_add_wallet(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as E:
-        logger.error(f"Could not send message: {E}")
+        logger.error(f"[ADD_WALLET] Could not send message: {E}")
         await state.clear()
 
 @router.message(WalletAdder.waiting_node_name, F.text)
 @logger.catch
 async def input_wallet_to_add(message: Message, state: FSMContext) -> None:
-    logger.debug("-> input_wallet_to_add")
+    logger.debug(f"[ADD_WALLET] -> input_wallet_to_add")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -71,7 +71,7 @@ async def input_wallet_to_add(message: Message, state: FSMContext) -> None:
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except Exception as E:
-            logger.error(f"Could not send message: {E}")
+            logger.error(f"[ADD_WALLET] Could not send message: {E}")
         await state.clear()
         return
 
@@ -87,13 +87,13 @@ async def input_wallet_to_add(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as E:
-        logger.error(f"Could not send message: {E}")
+        logger.error(f"[ADD_WALLET] Could not send message: {E}")
         await state.clear()
 
 @router.message(WalletAdder.waiting_wallet_address, F.text.startswith("AU"))
 @logger.catch
 async def add_wallet(message: Message, state: FSMContext) -> None:
-    logger.debug("-> add_wallet")
+    logger.debug(f"[ADD_WALLET] -> add_wallet")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -102,7 +102,7 @@ async def add_wallet(message: Message, state: FSMContext) -> None:
         node_name = user_state['node_name']
         wallet_address = message.text.strip()
     except Exception as E:
-        logger.error(f"Cannot read state: {E}")
+        logger.error(f"[ADD_WALLET] Cannot read state: {E}")
         await state.clear()
         return
 
@@ -119,7 +119,7 @@ async def add_wallet(message: Message, state: FSMContext) -> None:
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except Exception as E:
-            logger.error(f"Could not send message: {E}")
+            logger.error(f"[ADD_WALLET] Could not send message: {E}")
         await state.clear()
         return
 
@@ -159,7 +159,7 @@ async def add_wallet(message: Message, state: FSMContext) -> None:
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except Exception as e2:
-            logger.error(f"Could not send message: {e2}")
+            logger.error(f"[ADD_WALLET] Could not send message: {e2}")
         await state.clear()
         return
 
@@ -180,7 +180,7 @@ async def add_wallet(message: Message, state: FSMContext) -> None:
             disable_web_page_preview=True
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[ADD_WALLET] Could not send message: {e}")
 
     await state.clear()
 

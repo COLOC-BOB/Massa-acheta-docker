@@ -14,7 +14,7 @@ router = Router()
 @router.message(StateFilter(None), Command("view_id"))
 @logger.catch
 async def cmd_view_id(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_view_id")
+    logger.debug(f"[VIEW_ID] -> cmd_view_id")
     user_id = message.from_user.id
     chat_id = message.chat.id
 
@@ -31,4 +31,4 @@ async def cmd_view_id(message: Message, state: FSMContext) -> None:
               request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send message to user '{user_id}' in chat '{chat_id}' ({str(e)})")
+        logger.error(f"[VIEW_ID] Could not send message to user '{user_id}' in chat '{chat_id}' ({str(e)})")

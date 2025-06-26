@@ -58,7 +58,7 @@ async def get_block_info(block_id, api_url):
         if block_list:
             return block_list[0]
     except Exception as e:
-        logger.error(f"Erreur lors de la récupération du block {block_id}: {e}")
+        logger.error(f"[BLOCKS] Erreur lors de la récupération du block {block_id}: {str(e)}")
     return None
 
 async def fetch_and_alert_block(block_id, node_url, node_name, wallet_address):
@@ -75,26 +75,26 @@ async def fetch_and_alert_block(block_id, node_url, node_name, wallet_address):
         )
         logger.success(f"🟢 Nouveau block créé par {wallet_address}: {block_id}")
     else:
-        logger.warning(f"Block {block_id} non trouvé ou non récupéré par l'API.")
+        logger.warning(f"[BLOCKS] Block {block_id} non trouvé ou non récupéré par l'API.")
 
 async def watch_blocks(polling_interval=10):
     try:
         previous_blocks = load_json_watcher(WATCH_FILE, {})
     except Exception as e:
-        logger.error(f"Erreur chargement {WATCH_FILE} : {e}")
+        logger.error(f"[BLOCKS] Erreur chargement {WATCH_FILE} : {str(e)}")
         previous_blocks = {}
 
-    logger.info("Watcher: blocks started")
+    logger.info(f"[BLOCKS] Watcher: blocks started")
     while True:
         if not is_watcher_enabled("blocks"):
-            logger.info("[BLOCKS] Désactivé, je dors...")
+            logger.info(f"[BLOCKS] Désactivé, je dors...")
             await asyncio.sleep(60)
             continue
         
         for node_name, node_data in app_globals.app_results.items():
             node_url = node_data.get("url")
             for wallet_address in node_data.get("wallets", {}):
-                logger.debug(f"Checking wallet {wallet_address} on node {node_name}")
+                logger.debug(f"[BLOCKS] Checking wallet {wallet_address} on node {node_name}")
                 try:
                     payload = {
                         "jsonrpc": "2.0",
@@ -109,16 +109,16 @@ async def watch_blocks(polling_interval=10):
                         api_content_type="application/json"
                     )
                 except Exception as e:
-                    logger.warning(f"API error for {wallet_address}@{node_name}: {e}")
+                    logger.warning(f"[BLOCKS] API error for {wallet_address}@{node_name}: {str(e)}")
                     continue
 
                 result = resp.get("result", {}).get("result")
 
                 if not result or not isinstance(result, list) or not result[0]:
-                    logger.debug(f"{wallet_address}: résultat API inexploitable")
+                    logger.debug(f"[BLOCKS] {wallet_address}: résultat API inexploitable")
                     continue
                 if "created_blocks" not in result[0]:
-                    logger.debug(f"{wallet_address}: champ 'created_blocks' absent dans la réponse")
+                    logger.debug(f"[BLOCKS] {wallet_address}: champ 'created_blocks' absent")
                     continue
                 created_blocks = result[0]["created_blocks"]
                 log_short_blocks(wallet_address, created_blocks, label="created_blocks")
@@ -130,7 +130,7 @@ async def watch_blocks(polling_interval=10):
                 log_short_blocks(wallet_address, new_blocks, label="new_blocks")
 
                 if not created_blocks or len(created_blocks) == 0:
-                    logger.warning(f"{wallet_address}@{node_name}: Pas de blocks créés (created_blocks vide). Peut-être une limitation du node public.")
+                    logger.warning(f"[BLOCKS] {wallet_address}@{node_name}: Pas de blocks créés (created_blocks vide). Peut-être une limitation du node public.")
                     continue
 
                 if new_blocks:
@@ -141,9 +141,9 @@ async def watch_blocks(polling_interval=10):
                     previous_blocks[wallet_address] = created_blocks
                     try:
                         save_json_watcher(WATCH_FILE, previous_blocks)
-                        logger.info(f"{WATCH_FILE} mis à jour pour {wallet_address} ({len(created_blocks)} blocks connus)")
+                        logger.info(f"[BLOCKS] {WATCH_FILE} mis à jour pour {wallet_address} ({len(created_blocks)} blocks connus)")
                     except Exception as e:
-                        logger.error(f"Erreur sauvegarde {WATCH_FILE}: {e}")
+                        logger.error(f"[BLOCKS] Erreur sauvegarde {WATCH_FILE}: {str(e)}")
         await asyncio.sleep(polling_interval)
 
     await save_history(history)

@@ -15,7 +15,7 @@ router = Router()
 @router.message(Command("cancel"))
 @logger.catch
 async def cmd_cancel(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_cancel")
+    logger.debug(f"[CANCEL] -> cmd_cancel")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -28,4 +28,4 @@ async def cmd_cancel(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send cancel message: {e}")
+        logger.error(f"[CANCEL] Could not send cancel message: {e}")

@@ -19,7 +19,7 @@ def text_link(text: str, url: str) -> str:
 
 @logger.catch
 async def massa_release() -> None:
-    logger.debug("-> massa_release")
+    logger.debug(f"[RELEASES] -> massa_release")
 
     massa_release_answer = {"error": "No response from remote HTTP API"}
     try:
@@ -59,7 +59,7 @@ async def massa_release() -> None:
 
 @logger.catch
 async def acheta_release() -> None:
-    logger.debug("-> acheta_release")
+    logger.debug(f"[RELEASES] -> acheta_release")
 
     try:
         acheta_release_answer = await pull_http_api(
@@ -73,7 +73,7 @@ async def acheta_release() -> None:
             raise Exception(f"Wrong answer from MASSA node API ({acheta_release_answer})")
 
     except BaseException as E:
-        logger.warning(f"Cannot get latest ACHETA release version: ({E}). Result: {acheta_release_answer}")
+        logger.warning(f"[RELEASES] Cannot get latest ACHETA release version: ({E}). Result: {acheta_release_answer}")
 
     else:
         logger.info(f"Got latest ACHETA release version: '{acheta_release_result}' (local is: '{app_globals.local_acheta_release}')")
@@ -100,7 +100,7 @@ async def acheta_release() -> None:
 
 @logger.catch
 async def check_releases() -> None:
-    logger.debug("-> check_releases")
+    logger.debug(f"[RELEASES] -> check_releases")
     await massa_release()
     await acheta_release()
 

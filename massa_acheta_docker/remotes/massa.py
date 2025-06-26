@@ -9,7 +9,7 @@ from remotes_utils import pull_http_api, t_now, save_app_stat
 
 @logger.catch
 async def massa_get_info() -> bool:
-    logger.debug("-> massa_get_info")
+    logger.debug(f"[MASSA] -> massa_get_info")
     try:
         massa_info_answer = await pull_http_api(
             api_url=f"{app_config['service']['mainnet_rpc_url']}/info",
@@ -17,7 +17,7 @@ async def massa_get_info() -> bool:
         )
         massa_info_result = massa_info_answer.get("result", None)
         if not massa_info_result:
-            logger.warning(f"No result in MASSA mainnet RPC /info answer ({massa_info_answer})")
+            logger.warning(f"[MASSA] No result in MASSA mainnet RPC /info answer ({massa_info_answer})")
             return False
 
         # Champs principaux (ne pas inclure les champs non présents)
@@ -30,18 +30,18 @@ async def massa_get_info() -> bool:
             if value is not None:
                 app_globals.massa_network['values'][global_key] = value
             else:
-                logger.warning(f"No {api_field} in MASSA mainnet RPC /info answer")
+                logger.warning(f"[MASSA] No {api_field} in MASSA mainnet RPC /info answer")
 
     except Exception as E:
-        logger.warning(f"Cannot operate MASSA mainnet RPC /info: {E}")
+        logger.warning(f"[MASSA] Cannot operate MASSA mainnet RPC /info: {E}")
         return False
 
-    logger.debug(f"MASSA /info: {app_globals.massa_network['values']}")
+    logger.debug(f"[MASSA] /info: {app_globals.massa_network['values']}")
     return True
 
 @logger.catch
 async def massa_get_status() -> bool:
-    logger.debug("-> massa_get_status")
+    logger.debug(f"[MASSA] -> massa_get_status")
     payload = json.dumps({
         "id": 0,
         "jsonrpc": "2.0",
@@ -58,7 +58,7 @@ async def massa_get_status() -> bool:
         )
         massa_status_result = massa_status_answer.get("result", None)
         if not massa_status_result:
-            logger.warning(f"No result in MASSA mainnet RPC 'get_status' answer ({massa_status_answer})")
+            logger.warning(f"[MASSA] No result in MASSA mainnet RPC 'get_status' answer ({massa_status_answer})")
             return False
 
         # Extraction des champs principaux
@@ -77,7 +77,7 @@ async def massa_get_status() -> bool:
         config = massa_status_result.get("config", {})
         if config:
             app_globals.massa_config = config.copy()
-            logger.debug(f"[massa_get_status] massa_config updated: {app_globals.massa_config}")
+            logger.debug(f"[MASSA] massa_config updated: {app_globals.massa_config}")
         for api_field, global_key, cast in [
             ("block_reward", "block_reward", float),
             ("roll_price", "roll_price", int),
@@ -100,21 +100,21 @@ async def massa_get_status() -> bool:
                 app_globals.massa_network['values'][k] = value
 
     except Exception as E:
-        logger.warning(f"Cannot operate MASSA mainnet RPC get_status: {E}")
+        logger.warning(f"[MASSA] Cannot operate MASSA mainnet RPC get_status: {E}")
         return False
 
-    logger.debug(f"MASSA get_status: {app_globals.massa_network['values']}")
+    logger.debug(f"[MASSA] massa_get_status: {app_globals.massa_network['values']}")
     return True
 
 @logger.catch
 async def massa_get_stakers() -> bool:
-    logger.debug("-> massa_get_stakers")
+    logger.debug(f"[MASSA] -> massa_get_stakers")
     massa_total_rolls = 0
     massa_stakers_offset = 0
     massa_stakers_bundle_length = app_config['service']['mainnet_stakers_bundle']
 
     while True:
-        logger.debug(f"massa_get_stakers loop offset {massa_stakers_offset}")
+        logger.debug(f"[MASSA] massa_get_stakers loop offset {massa_stakers_offset}")
         payload = json.dumps({
             "id": 0,
             "jsonrpc": "2.0",
@@ -134,15 +134,15 @@ async def massa_get_stakers() -> bool:
             massa_stakers_result = massa_stakers_answer.get("result", None)
             # Cas erreur : pas de result
             if massa_stakers_result is None:
-                logger.warning(f"No result in MASSA mainnet RPC 'get_stakers' answer ({massa_stakers_answer})")
+                logger.warning(f"[MASSA] No result in MASSA mainnet RPC 'get_stakers' answer ({massa_stakers_answer})")
                 break
             # Cas résultat = dict vide : fin de pagination
             if isinstance(massa_stakers_result, dict):
-                logger.info(f"End of stakers pagination (empty dict)")
+                logger.info(f"[MASSA] End of stakers pagination (empty dict)")
                 break
             # Cas résultat = liste vide
             if isinstance(massa_stakers_result, list) and len(massa_stakers_result) == 0:
-                logger.info("No more stakers to fetch.")
+                logger.info(f"[MASSA] No more stakers to fetch.")
                 break
             # Cas résultat = liste
             if isinstance(massa_stakers_result, list):
@@ -151,54 +151,54 @@ async def massa_get_stakers() -> bool:
                         try:
                             massa_total_rolls += int(staker[1])
                         except Exception:
-                            logger.warning(f"Invalid roll number for staker {staker}")
+                            logger.warning(f"[MASSA] Invalid roll number for staker {staker}")
                     else:
-                        logger.warning(f"Cannot take rolls number from staker '{staker}'")
+                        logger.warning(f"[MASSA] Cannot take rolls number from staker '{staker}'")
                 # Pagination : avancer du nombre reçu
                 massa_stakers_offset += len(massa_stakers_result)
             else:
-                logger.warning(f"Unknown format in MASSA mainnet RPC 'get_stakers' answer: {type(massa_stakers_result)}")
+                logger.warning(f"[MASSA] Unknown format in MASSA mainnet RPC 'get_stakers' answer: {type(massa_stakers_result)}")
                 break
         except BaseException as E:
-            logger.warning(f"Cannot operate MASSA mainnet RPC get_stakers: {E}")
+            logger.warning(f"[MASSA] Cannot operate MASSA mainnet RPC get_stakers: {E}")
             return False
 
         await asyncio.sleep(1)
 
     app_globals.massa_network['values']['total_staked_rolls'] = massa_total_rolls
-    logger.debug(f"MASSA total_staked_rolls: {massa_total_rolls}")
+    logger.debug(f"[MASSA] massa_get_stakers: total_staked_rolls: {massa_total_rolls}")
     return True
 
 
 @logger.catch
 async def massa() -> None:
-    logger.debug("-> massa")
+    logger.debug(f"[MASSA] -> massa")
     try:
         while True:
             success_flag = True
             if success_flag and await massa_get_info():
-                logger.info("Successfully pulled /info from MASSA mainnet RPC")
+                logger.info(f"[MASSA] Successfully pulled /info from MASSA mainnet RPC")
                 await asyncio.sleep(1)
             else:
                 success_flag = False
-                logger.warning("Error pulling /info from MASSA mainnet RPC")
+                logger.warning(f"[MASSA] Error pulling /info from MASSA mainnet RPC")
 
             if success_flag and await massa_get_status():
-                logger.info("Successfully pulled get_status from MASSA mainnet RPC")
+                logger.info(f"[MASSA] Successfully pulled get_status from MASSA mainnet RPC")
                 await asyncio.sleep(1)
             else:
                 success_flag = False
-                logger.warning("Error pulling get_status from MASSA mainnet RPC")
+                logger.warning(f"[MASSA] Error pulling get_status from MASSA mainnet RPC")
 
             if success_flag and await massa_get_stakers():
-                logger.info("Successfully pulled get_stakers from MASSA mainnet RPC")
+                logger.info(f"[MASSA] Successfully pulled get_stakers from MASSA mainnet RPC")
                 await asyncio.sleep(1)
             else:
                 success_flag = False
-                logger.warning("Error pulling get_stakers from MASSA mainnet RPC")
+                logger.warning(f"[MASSA] Error pulling get_stakers from MASSA mainnet RPC")
 
             if success_flag:
-                logger.info("Successfully collected MASSA mainnet network info")
+                logger.info(f"[MASSA] Successfully collected MASSA mainnet network info")
                 time_now = await t_now()
                 try:
                     app_globals.massa_network['values']['last_updated'] = time_now
@@ -216,18 +216,18 @@ async def massa() -> None:
                         }
                     )
                 except Exception as E:
-                    logger.warning(f"Cannot store MASSA stat ({E})")
+                    logger.warning(f"[MASSA] Cannot store MASSA stat ({E})")
                 else:
-                    logger.info(f"Successfully stored MASSA stat ({len(app_globals.massa_network['stat'])} measures)")
+                    logger.info(f"[MASSA] Successfully stored MASSA stat ({len(app_globals.massa_network['stat'])} measures)")
             else:
-                logger.warning("Could not collect MASSA mainnet network info")
-            logger.info(f"Sleeping for {app_config['service']['massa_network_update_period_min'] * 60} seconds...")
+                logger.warning(f"[MASSA] Could not collect MASSA mainnet network info")
+            logger.info(f"[MASSA] Sleeping for {app_config['service']['massa_network_update_period_min'] * 60} seconds...")
             await asyncio.sleep(app_config['service']['massa_network_update_period_min'] * 60)
             save_app_stat()
     except Exception as E:
-        logger.error(f"Exception {E}")
+        logger.error(f"[MASSA] Exception {E}")
     finally:
-        logger.error("<- Quit massa")
+        logger.error(f"[MASSA] <- Quit massa")
     return
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ router = Router()
 @router.message(StateFilter(None), Command("view_config"))
 @logger.catch
 async def cmd_view_config(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_view_config")
+    logger.debug(f"[VIEW_CONFIG] -> cmd_view_config")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -51,7 +51,7 @@ async def cmd_view_config(message: Message, state: FSMContext) -> None:
 @router.message(ConfigViewer.waiting_node_name, F.text)
 @logger.catch
 async def select_node_to_show(message: Message, state: FSMContext) -> None:
-    logger.debug("-> select_node_to_show [view_config]")
+    logger.debug(f"[VIEW_CONFIG] -> select_node_to_show")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -101,5 +101,5 @@ async def show_node_config(message: Message, node_name: str, state: FSMContext) 
             disable_web_page_preview=True
         )
     except Exception as e:
-        logger.error(f"Could not send config: {e}")
+        logger.error(f"[VIEW_CONFIG] Could not send config: {e}")
     await state.clear()

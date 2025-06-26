@@ -19,7 +19,7 @@ def bold(text):
 
 @logger.catch
 async def check_node(node_name: str="") -> None:
-    logger.debug(f"-> check_node")
+    logger.debug(f"[NODE] -> check_node")
 
     payload = json.dumps(
         {
@@ -83,7 +83,7 @@ async def check_node(node_name: str="") -> None:
             node_start_time = 0
 
     except BaseException as E:
-        logger.warning(f"Node '{node_name}' ({app_globals.app_results[node_name]['url']}) seems dead! ({E})")
+        logger.warning(f"[NODE] Node '{node_name}' ({app_globals.app_results[node_name]['url']}) seems dead! ({E})")
         message_lines = []
 
         if app_globals.app_results[node_name]['last_status'] != False:
@@ -113,7 +113,7 @@ async def check_node(node_name: str="") -> None:
         app_globals.app_results[node_name]['last_result'] = node_result
 
     else:
-        logger.info(f"Node '{node_name}' ({app_globals.app_results[node_name]['url']}) seems online ({node_chain_id=})")
+        logger.info(f"[NODE] Node '{node_name}' ({app_globals.app_results[node_name]['url']}) seems online ({node_chain_id=})")
         message_lines = []
 
         # MESSAGE DÉTAILLÉ
@@ -146,7 +146,7 @@ async def check_node(node_name: str="") -> None:
             )
 
         else:
-            logger.info(f"Node '{node_name}' ({app_globals.app_results[node_name]['url']}) seems online ({node_chain_id=})")
+            logger.info(f"[NODE] Node '{node_name}' ({app_globals.app_results[node_name]['url']}) seems online ({node_chain_id=})")
 
             # Si le numéro de cycle du node est < au réseau => ALERTE!
             if (node_current_cycle != "-" and 

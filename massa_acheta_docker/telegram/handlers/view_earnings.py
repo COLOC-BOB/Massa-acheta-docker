@@ -19,7 +19,7 @@ router = Router()
 
 @logger.catch
 async def get_earnings(rolls_number: int=1):
-    logger.debug("-> get_earnings")
+    logger.debug(f"[VIEW_EARNINGS] -> get_earnings")
     try:
         rolls_number = int(rolls_number)
         total_rolls = app_globals.massa_network['values']['total_staked_rolls']
@@ -51,7 +51,7 @@ async def get_earnings(rolls_number: int=1):
 @router.message(StateFilter(None), Command("view_earnings"))
 @logger.catch
 async def cmd_view_earnings(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_view_earnings")
+    logger.debug(f"[VIEW_EARNINGS] -> cmd_view_earnings")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -71,7 +71,7 @@ async def cmd_view_earnings(message: Message, state: FSMContext) -> None:
             )
             await state.set_state(EarningsViewer.waiting_rolls_number)
         except Exception as e:
-            logger.error(f"Could not send message: {e}")
+            logger.error(f"[VIEW_EARNINGS] Could not send message: {e}")
         return
 
     rolls_number = message_list[1]
@@ -84,7 +84,7 @@ async def cmd_view_earnings(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[VIEW_EARNINGS] Could not send message: {e}")
 
     await state.clear()
     return
@@ -92,7 +92,7 @@ async def cmd_view_earnings(message: Message, state: FSMContext) -> None:
 @router.message(EarningsViewer.waiting_rolls_number, F.text)
 @logger.catch
 async def show_earnings(message: Message, state: FSMContext) -> None:
-    logger.debug("-> show_earnings")
+    logger.debug(f"[VIEW_EARNINGS] -> show_earnings")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -112,7 +112,7 @@ async def show_earnings(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[VIEW_EARNINGS] Could not send message: {e}")
 
     await state.clear()
     return

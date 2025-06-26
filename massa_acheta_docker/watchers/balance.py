@@ -18,7 +18,7 @@ def load_json_history():
             with open(WATCH_FILE, "rt") as f:
                 return json.load(f)
         except Exception as e:
-            logger.error(f"Could not load balance watcher state: {e}")
+            logger.error(f"[BALANCE] Could not load balance watcher state: {e}")
     return {}
 
 async def save_json_history(history):
@@ -29,10 +29,10 @@ async def save_json_history(history):
                 json.dump(history, f, indent=2, ensure_ascii=False)
             os.replace(tmp_file, WATCH_FILE)
         except Exception as e:
-            logger.error(f"Could not save balance watcher state: {e}")
+            logger.error(f"[BALANCE] Could not save balance watcher state: {e}")
 
 async def watch_balance(polling_interval=30):
-    logger.info("[BALANCE] JSON Watcher started")
+    logger.info(f"[BALANCE] JSON Watcher started")
     # Structure :
     # {
     #   "My node": {
@@ -123,7 +123,7 @@ async def watch_balance(polling_interval=30):
                     history[node_name][wallet_address].append(entry)
 
                 except Exception as e:
-                    logger.error(f"[BALANCE] Error processing balance for {wallet_address}@{node_name}: {e}")
+                    logger.error(f"[BALANCE] Error processing balance for {wallet_address}@{node_name}: {str(e)}")
 
         await save_json_history(history)
         await asyncio.sleep(polling_interval)

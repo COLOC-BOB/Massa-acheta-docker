@@ -23,7 +23,7 @@ router = Router()
 @router.message(Command("delete_wallet"))
 @logger.catch
 async def cmd_delete_wallet(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_delete_wallet")
+    logger.debug(f"[DELETE_WALLET] -> cmd_delete_wallet")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -47,7 +47,7 @@ async def cmd_delete_wallet(message: Message, state: FSMContext) -> None:
 @router.message(WalletRemover.waiting_node_name, F.text)
 @logger.catch
 async def select_wallet_to_delete(message: Message, state: FSMContext) -> None:
-    logger.debug("-> select_wallet_to_delete")
+    logger.debug(f"[DELETE_WALLET] -> select_wallet_to_delete")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -72,7 +72,7 @@ async def select_wallet_to_delete(message: Message, state: FSMContext) -> None:
         await state.clear()
         return
     
-    logger.info(f"Set state: WalletRemover.waiting_wallet_address for node {node_name}")
+    logger.info(f"[DELETE_WALLET] Set state: WalletRemover.waiting_wallet_address for node {node_name}")
 
     await state.set_state(WalletRemover.waiting_wallet_address)
     await state.set_data(data={"node_name": node_name})
@@ -86,8 +86,8 @@ async def select_wallet_to_delete(message: Message, state: FSMContext) -> None:
 @router.message(WalletRemover.waiting_wallet_address, F.text.startswith("AU"))
 @logger.catch
 async def delete_wallet(message: Message, state: FSMContext) -> None:
-    logger.debug("-> delete_wallet")
-    logger.info(f"Delete wallet handler triggered for message: {message.text}")
+    logger.debug(f"[DELETE_WALLET] -> delete_wallet")
+    logger.info(f"[DELETE_WALLET] Delete wallet handler triggered for message: {message.text}")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -96,7 +96,7 @@ async def delete_wallet(message: Message, state: FSMContext) -> None:
         node_name = user_state['node_name']
         wallet_address = message.text.strip()
     except Exception as e:
-        logger.error(f"Cannot read state: {e}")
+        logger.error(f"[DELETE_WALLET] Cannot read state: {e}")
         await state.clear()
         return
 
@@ -120,7 +120,7 @@ async def delete_wallet(message: Message, state: FSMContext) -> None:
             app_globals.app_results[node_name]['wallets'].pop(wallet_address, None)
             save_app_results()
     except Exception as e:
-        logger.error(f"Cannot remove wallet '{wallet_address}' from node '{node_name}': ({str(e)})")
+        logger.error(f"[DELETE_WALLET] Cannot remove wallet '{wallet_address}' from node '{node_name}': ({str(e)})")
         short_addr = await get_short_address(wallet_address)
         short_node = await get_short_address(node_name)
         await message.reply(
@@ -136,7 +136,7 @@ async def delete_wallet(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     else:
-        logger.info(f"Successfully removed wallet '{wallet_address}' from node '{node_name}'")
+        logger.info(f"[DELETE_WALLET] Successfully removed wallet '{wallet_address}' from node '{node_name}'")
         short_addr = await get_short_address(wallet_address)
         short_node = await get_short_address(node_name)
         await message.reply(

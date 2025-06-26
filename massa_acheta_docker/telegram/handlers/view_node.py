@@ -22,7 +22,7 @@ router = Router()
 @router.message(StateFilter(None), Command("view_node"))
 @logger.catch
 async def cmd_view_node(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_view_node")
+    logger.debug(f"[VIEW_NODE] -> cmd_view_node")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -39,7 +39,7 @@ async def cmd_view_node(message: Message, state: FSMContext) -> None:
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except Exception as e:
-            logger.error(f"Could not send message: {e}")
+            logger.error(f"[VIEW_NODE] Could not send message: {e}")
         await state.clear()
         return
 
@@ -60,13 +60,13 @@ async def cmd_view_node(message: Message, state: FSMContext) -> None:
         )
         await state.set_state(NodeViewer.waiting_node_name)
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[VIEW_NODE] Could not send message: {e}")
         await state.clear()
 
 @router.message(NodeViewer.waiting_node_name, F.text)
 @logger.catch
 async def show_node(message: Message, state: FSMContext) -> None:
-    logger.debug("-> show_node (button)")
+    logger.debug(f"[VIEW_NODE] -> show_node (button)")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -87,7 +87,7 @@ async def show_node_info(message: Message, state: FSMContext, node_name: str) ->
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except Exception as e:
-            logger.error(f"Could not send message: {e}")
+            logger.error(f"[VIEW_NODE] Could not send message: {e}")
         await state.clear()
         return
 
@@ -154,6 +154,6 @@ async def show_node_info(message: Message, state: FSMContext, node_name: str) ->
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[VIEW_NODE] Could not send message: {e}")
 
     await state.clear()

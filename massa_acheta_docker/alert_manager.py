@@ -84,7 +84,7 @@ async def send_alert(alert_type, node=None, wallet=None, level="info", details=N
     last_sent = _alert_cooldown.get(key, 0)
     if now - last_sent < cooldown:
         logger.info(
-            f"Alert '{alert_type}' for {node or ''} {wallet or ''} skipped (cooldown)")
+            f"[ALERT] Alert '{alert_type}' for {node or ''} {wallet or ''} skipped (cooldown)")
         return
 
     # Compose le message
@@ -106,7 +106,7 @@ async def send_alert(alert_type, node=None, wallet=None, level="info", details=N
     logger.debug(
         f"[ALERT] Type: {alert_type}, Label: {label}, Message: {message}")
     logger.info(
-        f"Alert '{alert_type}' sent for {node or ''} {wallet or ''} (level: {level})")
+        f"[ALERT] Alert '{alert_type}' sent for {node or ''} {wallet or ''} (level: {level})")
     _alert_cooldown[key] = now
 
     # Ajoute ici d'autres canaux si tu veux (Discord, email, ...)

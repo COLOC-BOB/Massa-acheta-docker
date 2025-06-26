@@ -5,7 +5,7 @@ app_config['service']   = {}
 app_config['alerts']    = {}
 
 # --- Version ---
-app_config['config_version'] = "1.1"
+app_config['config_version'] = "2.0"
 
 # Telegram settings
 app_config['telegram']['sending_delay_sec'] = 2

@@ -19,7 +19,7 @@ router = Router()
 @router.message(Command("reset"))
 @logger.catch
 async def cmd_reset(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_reset")
+    logger.debug(f"[RESET] -> cmd_reset")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -37,13 +37,13 @@ async def cmd_reset(message: Message, state: FSMContext) -> None:
         )
         await state.set_state(ResetState.reset_sure)
     except Exception as e:
-        logger.error(f"Could not send reset prompt: {e}")
+        logger.error(f"[RESET] Could not send reset prompt: {e}")
         await state.clear()
 
 @router.message(ResetState.reset_sure, F.text)
 @logger.catch
 async def do_reset(message: Message, state: FSMContext) -> None:
-    logger.debug("-> do_reset")
+    logger.debug(f"[RESET] -> do_reset")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -60,7 +60,7 @@ async def do_reset(message: Message, state: FSMContext) -> None:
                 request_timeout=app_config['telegram']['sending_timeout_sec']
             )
         except Exception as e:
-            logger.error(f"Could not send reset rejection: {e}")
+            logger.error(f"[RESET] Could not send reset rejection: {e}")
         await state.clear()
         return
 
@@ -87,6 +87,6 @@ async def do_reset(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send reset result: {e}")
+        logger.error(f"[RESET] Could not send reset result: {e}")
 
     await state.clear()

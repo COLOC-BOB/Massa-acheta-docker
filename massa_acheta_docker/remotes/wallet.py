@@ -18,10 +18,10 @@ def bold(text):
 
 @logger.catch
 async def check_wallet(node_name: str="", wallet_address: str="") -> None:
-    logger.debug(f"-> check_wallet")
+    logger.debug(f"[WALLET] -> check_wallet")
 
     if app_globals.app_results[node_name]['last_status'] != True:
-        logger.warning(f"Will not watch wallet '{wallet_address}'@'{node_name}' because of its offline")
+        logger.warning(f"[WALLET] Will not watch wallet '{wallet_address}'@'{node_name}' because of its offline")
 
         app_globals.app_results[node_name]['wallets'][wallet_address]['last_status'] = False
         app_globals.app_results[node_name]['wallets'][wallet_address]['last_result'] = {"error": "Host node is offline"}
@@ -64,7 +64,7 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
         wallet_missed_blocks = sum(ci.get("nok_count", 0) for ci in wallet_cycle_infos)
 
     except BaseException as E:
-        logger.warning(f"Error watching wallet '{wallet_address}' on '{node_name}': ({E})")
+        logger.warning(f"[WALLET] Error watching wallet '{wallet_address}' on '{node_name}': ({E})")
 
         if app_globals.app_results[node_name]['wallets'][wallet_address]['last_status'] != False:
             message_lines = [
@@ -74,7 +74,7 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
                 f"💥 Exception: {code(str(E))}",
                 "⚠ Check wallet address or node settings!"
             ]
-            logger.warning(f"Wallet '{wallet_address}'@'{node_name}' RPC error: {str(E)}")
+            logger.warning(f"[WALLET] Wallet '{wallet_address}'@'{node_name}' RPC error: {str(E)}")
             await send_alert(
                 alert_type="wallet_rpc_error",
                 node=node_name,
@@ -183,7 +183,7 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
             f"👛 Wallet: <code>{wallet_address}</code>",
             f"Total produced: {wallet_operated_blocks}"
         ]
-        logger.info(f"Wallet '{wallet_address}'@'{node_name}' produced {delta} new block(s)")
+        logger.info(f"[WALLET] Wallet '{wallet_address}'@'{node_name}' produced {delta} new block(s)")
         await send_alert(
             alert_type="wallet_block_produced",
             node=node_name,
@@ -222,7 +222,7 @@ async def check_wallet(node_name: str="", wallet_address: str="") -> None:
         "produced_blocks": wallet_operated_blocks
     })
 
-    logger.info(f"Stat updated for wallet '{wallet_address}'@'{node_name}'")
+    logger.info(f"[WALLET] Stat updated for wallet '{wallet_address}'@'{node_name}'")
     return
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ router = Router()
 @router.message(StateFilter(None), Command("massa_chart"))
 @logger.catch
 async def cmd_massa_chart(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_massa_chart")
+    logger.debug(f"[MASSA_CHART] -> cmd_massa_chart")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -180,7 +180,7 @@ async def cmd_massa_chart(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as E:
-        logger.error(f"Cannot prepare MASSA Mainnet chart ({str(E)})")
+        logger.error(f"[MASSA_CHART] Cannot prepare MASSA Mainnet chart ({str(E)})")
         await message.reply(
             text="🤷 Charts are temporarily unavailable. Try later.\n☝ Use the command menu to learn bot commands",
             reply_markup=build_menu_keyboard(),

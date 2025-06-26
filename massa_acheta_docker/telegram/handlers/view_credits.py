@@ -78,7 +78,7 @@ async def get_credits(wallet_address: str=""):
 @router.message(StateFilter(None), Command("view_credits"))
 @logger.catch
 async def cmd_view_credits(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_view_credits")
+    logger.debug(f"[VIEW_CREDITS] -> cmd_view_credits")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -96,7 +96,7 @@ async def cmd_view_credits(message: Message, state: FSMContext) -> None:
                 disable_web_page_preview=True
             )
         except Exception as e:
-            logger.error(f"Could not send message: {e}")
+            logger.error(f"[VIEW_CREDITS] Could not send message: {e}")
         await state.clear()
         return
 
@@ -122,13 +122,13 @@ async def cmd_view_credits(message: Message, state: FSMContext) -> None:
             disable_web_page_preview=True
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[VIEW_CREDITS] Could not send message: {e}")
         await state.clear()
 
 @router.message(CreditsViewer.waiting_node_name, F.text)
 @logger.catch
 async def select_wallet_node(message: Message, state: FSMContext) -> None:
-    logger.debug("-> select_wallet_node")
+    logger.debug(f"[VIEW_CREDITS] -> select_wallet_node")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -171,13 +171,13 @@ async def select_wallet_node(message: Message, state: FSMContext) -> None:
             disable_web_page_preview=True
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[VIEW_CREDITS] Could not send message: {e}")
         await state.clear()
 
 @router.message(CreditsViewer.waiting_wallet_address, F.text.startswith("AU"))
 @logger.catch
 async def show_credits_selected(message: Message, state: FSMContext) -> None:
-    logger.debug("-> show_credits_selected")
+    logger.debug(f"[VIEW_CREDITS] -> show_credits_selected")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -186,7 +186,7 @@ async def show_credits_selected(message: Message, state: FSMContext) -> None:
         node_name = user_state["node_name"]
         wallet_address = message.text.strip()
     except Exception as e:
-        logger.error(f"Cannot read state: {e}")
+        logger.error(f"[VIEW_CREDITS] Cannot read state: {e}")
         await state.clear()
         return
 
@@ -213,6 +213,6 @@ async def show_credits_selected(message: Message, state: FSMContext) -> None:
             disable_web_page_preview=True
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[VIEW_CREDITS] Could not send message: {e}")
 
     await state.clear()

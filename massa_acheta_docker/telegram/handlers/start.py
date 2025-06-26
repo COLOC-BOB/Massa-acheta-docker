@@ -14,7 +14,7 @@ router = Router()
 @router.message(StateFilter(None), Command("start"))
 @logger.catch
 async def cmd_start(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_start")
+    logger.debug(f"[START] -> cmd_start")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -33,4 +33,4 @@ async def cmd_start(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send start message: {e}")
+        logger.error(f"[START] Could not send start message: {e}")

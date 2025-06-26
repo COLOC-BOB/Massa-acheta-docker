@@ -19,7 +19,7 @@ class AddressViewer(StatesGroup):
 router = Router()
 
 async def get_address(wallet_address: str=""):
-    logger.debug("-> get_address")
+    logger.debug(f"[VIEW_ADDRESS] -> get_address")
     if not wallet_address.startswith("AU"):
         msg = (
             "‼️ Wrong wallet address format (expected a string starting with AU prefix)\n\n"
@@ -75,7 +75,7 @@ async def get_address(wallet_address: str=""):
 @router.message(StateFilter(None), Command("view_address"))
 @logger.catch
 async def cmd_view_address(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_view_address")
+    logger.debug(f"[VIEW_ADDRESS] -> cmd_view_address")
     await state.set_state(AddressViewer.waiting_wallet_address)
     await message.reply(
         text="❓ Entrez une adresse AU... à afficher (ou /cancel pour quitter) :",
@@ -87,7 +87,7 @@ async def cmd_view_address(message: Message, state: FSMContext) -> None:
 @router.message(AddressViewer.waiting_wallet_address, F.text)
 @logger.catch
 async def show_manual_address(message: Message, state: FSMContext) -> None:
-    logger.debug("-> show_manual_address")
+    logger.debug(f"[VIEW_ADDRESS] -> show_manual_address")
     wallet_address = message.text.strip()
     if not wallet_address.startswith("AU"):
         await message.reply(
@@ -108,6 +108,6 @@ async def show_manual_address(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[VIEW_ADDRESS] Could not send message: {e}")
 
     await state.clear()

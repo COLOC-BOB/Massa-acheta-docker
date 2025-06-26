@@ -18,10 +18,10 @@ WATCH_FILE = "watchers_state/operations_seen.json"
 def log_short_ops(wallet_address, ops, label="created_operations", preview=10):
     n = len(ops)
     if n == 0:
-        logger.debug(f"{wallet_address} {label}: [aucune opération]")
+        logger.debug(f"[OPERATIONS] {wallet_address} {label}: [aucune opération]")
     else:
         short_list = ops[:preview] + (["..."] if n > preview else [])
-        logger.debug(f"{wallet_address} {label} (total {n}): {short_list}")
+        logger.debug(f"[OPERATIONS] {wallet_address} {label} (total {n}): {short_list}")
 
 async def get_operation_details(op_id, node_url):
     payload = {
@@ -48,7 +48,7 @@ async def get_operation_details(op_id, node_url):
         if op_list and len(op_list) > 0:
             return op_list[0]
     except Exception as e:
-        logger.error(f"[OPERATIONS] Erreur lors de la récupération du détail op {op_id}: {e}")
+        logger.error(f"[OPERATIONS] Erreur lors de la récupération du détail op {op_id}: {str(e)}")
     return None
 
 def format_operation_details(op_detail):
@@ -62,10 +62,10 @@ def format_operation_details(op_detail):
     expire_period = op_content.get("expire_period", "-")
     op_types = op_content.get("op", {})       # <<<<<< Et ici
 
-    logger.debug(f"[WATCHER] op_types: {op_types}")
-    logger.debug(f"[WATCHER] Operation details raw: {json.dumps(op_detail, indent=2, ensure_ascii=False)}")
-    logger.debug(f"[WATCHER] op_obj: {json.dumps(op_obj, indent=2, ensure_ascii=False)}")
-    logger.debug(f"[WATCHER] content: {json.dumps(op_content, indent=2, ensure_ascii=False)}")
+    logger.debug(f"[OPERATIONS] op_types: {op_types}")
+    logger.debug(f"[OPERATIONS] Operation details raw: {json.dumps(op_detail, indent=2, ensure_ascii=False)}")
+    logger.debug(f"[OPERATIONS] op_obj: {json.dumps(op_obj, indent=2, ensure_ascii=False)}")
+    logger.debug(f"[OPERATIONS] content: {json.dumps(op_content, indent=2, ensure_ascii=False)}")
 
     if "Transaction" in op_types:
         op_type = "Transaction"
@@ -139,20 +139,20 @@ async def watch_operations(polling_interval=30):
     try:
         previous_ops = load_json_watcher(WATCH_FILE, {})
     except Exception as e:
-        logger.error(f"Erreur chargement {WATCH_FILE} : {e}")
+        logger.error(f"[OPERATIONS] Erreur chargement {WATCH_FILE} : {str(e)}")
         previous_ops = {}
 
-    logger.info("[OPERATIONS] Watcher: operations started")
+    logger.info(f"[OPERATIONS] Watcher: operations started")
     while True:
         if not is_watcher_enabled("operations"):
-            logger.info("[OPERATIONS] Désactivé, je dors...")
+            logger.info(f"[OPERATIONS] Désactivé, je dors...")
             await asyncio.sleep(60)
             continue
 
         for node_name, node_data in app_globals.app_results.items():
             node_url = node_data.get("url") or app_globals.app_config["service"]["mainnet_rpc_url"]
             for wallet_address in node_data.get("wallets", {}):
-                logger.debug(f"Checking wallet {wallet_address} on node {node_name}")
+                logger.debug(f"[OPERATIONS] Checking wallet {wallet_address} on node {node_name}")
                 try:
                     payload = {
                         "jsonrpc": "2.0",
@@ -167,16 +167,16 @@ async def watch_operations(polling_interval=30):
                         api_content_type="application/json"
                     )
                 except Exception as e:
-                    logger.warning(f"API error for {wallet_address}@{node_name}: {e}")
+                    logger.warning(f"[OPERATIONS] API error for {wallet_address}@{node_name}: {str(e)}")
                     continue
 
                 # Compatibilité: API peut répondre .result.result ou .result
                 result = resp.get("result", {}).get("result") if isinstance(resp.get("result", {}), dict) else resp.get("result")
                 if not result or not isinstance(result, list) or not result[0]:
-                    logger.debug(f"{wallet_address}: résultat API inexploitable")
+                    logger.debug(f"[OPERATIONS] {wallet_address}: résultat API inexploitable")
                     continue
                 if "created_operations" not in result[0]:
-                    logger.debug(f"{wallet_address}: champ 'created_operations' absent dans la réponse")
+                    logger.debug(f"[OPERATIONS] {wallet_address}: champ 'created_operations' absent dans la réponse")
                     continue
                 created_ops = result[0]["created_operations"]
                 log_short_ops(wallet_address, created_ops, label="created_operations")
@@ -187,7 +187,7 @@ async def watch_operations(polling_interval=30):
                 log_short_ops(wallet_address, new_ops, label="new_operations")
 
                 if not created_ops or len(created_ops) == 0:
-                    logger.warning(f"{wallet_address}@{node_name}: Pas d'opérations créées (created_operations vide). Peut-être une limitation du node public.")
+                    logger.warning(f"[OPERATIONS] {wallet_address}@{node_name}: Pas d'opérations créées (created_operations vide). Peut-être une limitation du node public.")
                     continue
 
                 if new_ops:
@@ -217,6 +217,6 @@ async def watch_operations(polling_interval=30):
                         save_json_watcher(WATCH_FILE, previous_ops)
                         logger.info(f"{WATCH_FILE} mis à jour pour {wallet_address} ({len(created_ops)} opérations connues)")
                     except Exception as e:
-                        logger.error(f"Erreur sauvegarde {WATCH_FILE}: {e}")
+                        logger.error(f"[OPERATIONS] Erreur sauvegarde {WATCH_FILE}: {str(e)}")
 
         await asyncio.sleep(polling_interval)

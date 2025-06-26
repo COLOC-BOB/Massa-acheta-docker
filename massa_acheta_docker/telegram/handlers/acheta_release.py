@@ -14,7 +14,7 @@ router = Router()
 @router.message(Command("acheta_release"))
 @logger.catch
 async def cmd_acheta_release(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_acheta_release")
+    logger.debug(f"[ACHETA_RELEASE] -> cmd_acheta_release")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -42,4 +42,4 @@ async def cmd_acheta_release(message: Message, state: FSMContext) -> None:
 
         )
     except Exception as e:
-        logger.error(f"Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(e)})")
+        logger.error(f"[ACHETA_RELEASE] Could not send message to user '{message.from_user.id}' in chat '{message.chat.id}' ({str(e)})")

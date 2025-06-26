@@ -18,7 +18,7 @@ def load_json_history():
             with open(WATCH_FILE, "rt") as f:
                 return json.load(f)
         except Exception as e:
-            logger.error(f"Could not load deferred credits watcher state: {e}")
+            logger.error(f"[DEFERRED] Could not load deferred credits watcher state: {str(e)}")
     return {}
 
 async def save_json_history(history):
@@ -29,10 +29,10 @@ async def save_json_history(history):
                 json.dump(history, f, indent=2, ensure_ascii=False)
             os.replace(tmp_file, WATCH_FILE)
         except Exception as e:
-            logger.error(f"Could not save deferred credits watcher state: {e}")
+            logger.error(f"[DEFERRED] Could not save deferred credits watcher state: {str(e)}")
 
 async def watch_deferred_credits(polling_interval=30):
-    logger.info("[DEFERRED] JSON Watcher started")
+    logger.info(f"[DEFERRED] JSON Watcher started")
     # Structure :
     # {
     #   "My node": {
@@ -127,7 +127,7 @@ async def watch_deferred_credits(polling_interval=30):
                             logger.success(f"[DEFERRED] New credit for {wallet_address}@{node_name}: period={period}, thread={thread}, amount={amount}")
 
                 except Exception as e:
-                    logger.error(f"[DEFERRED] Error fetching wallet {wallet_address}: {e}")
+                    logger.error(f"[DEFERRED] Error fetching wallet {wallet_address}: {str(e)}")
 
         await save_json_history(history)
         await asyncio.sleep(polling_interval)

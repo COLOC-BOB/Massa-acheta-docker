@@ -24,7 +24,7 @@ router = Router()
 @router.message(Command("chart_wallet"))
 @logger.catch
 async def cmd_chart_wallet(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_chart_wallet")
+    logger.debug(f"[CHART_WALLET]  -> cmd_chart_wallet")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -55,7 +55,7 @@ async def cmd_chart_wallet(message: Message, state: FSMContext) -> None:
 @router.message(ChartWalletViewer.waiting_node_name, F.text)
 @logger.catch
 async def select_wallet_to_show(message: Message, state: FSMContext) -> None:
-    logger.debug("-> select_wallet_to_show")
+    logger.debug(f"[CHART_WALLET] -> select_wallet_to_show")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -102,7 +102,7 @@ async def select_wallet_interactive(message: Message, state: FSMContext, node_na
 @router.message(ChartWalletViewer.waiting_wallet_address, F.text.startswith("AU"))
 @logger.catch
 async def show_wallet(message: Message, state: FSMContext) -> None:
-    logger.debug("-> show_wallet")
+    logger.debug(f"[CHART_WALLET] -> show_wallet")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
 
@@ -111,7 +111,7 @@ async def show_wallet(message: Message, state: FSMContext) -> None:
         node_name = user_state['node_name']
         wallet_address = message.text.strip()
     except Exception as e:
-        logger.error(f"Cannot read state: {e}")
+        logger.error(f"[CHART_WALLET] Cannot read state: {e}")
         await state.clear()
         return
 
@@ -399,7 +399,7 @@ async def show_wallet_chart(message: Message, state: FSMContext, node_name: str,
         )
 
     except Exception as E:
-        logger.error(f"Cannot prepare wallet chart ({str(E)})")
+        logger.error(f"[CHART_WALLET] Cannot prepare wallet chart ({str(E)})")
         await message.reply(
             text="🤷 Charts are temporarily unavailable. Try later.\n☝ Use the command menu to learn bot commands",
             parse_mode="HTML",

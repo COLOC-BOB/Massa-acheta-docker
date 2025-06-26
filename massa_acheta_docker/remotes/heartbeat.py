@@ -13,36 +13,34 @@ def html_link(text, url):
 
 def format_wallet_line(wallet_address, balance, produced_blocks, last_cycle, explorer_url):
     return (
-        f"⦙<\n>"
         f"⦙… {html_link(wallet_address, explorer_url)} "
         f"( {balance} MAS | {produced_blocks} OK | cycle {last_cycle} )"
     )
 
 def format_wallet_line_unknown(wallet_address, explorer_url):
     return (
-        f"⦙<\n>"
         f"⦙… {html_link(wallet_address, explorer_url)} "
         f"( ? MAS | ? OK | cycle ? )"
     )
 
 async def heartbeat() -> None:
-    logger.debug("-> heartbeat")
+    logger.debug(f"[HEARTBEAT] -> heartbeat")
 
     try:
         while True:
-            logger.info(f"Sleeping for {app_config['service']['heartbeat_period_hours'] * 60 * 60} seconds...")
+            logger.info(f"[HEARTBEAT] Sleeping for {app_config['service']['heartbeat_period_hours'] * 60 * 60} seconds...")
             await asyncio.sleep(app_config['service']['heartbeat_period_hours'] * 60 * 60)
-            logger.info("Heartbeat planner schedule time")
+            logger.info(f"[HEARTBEAT] Heartbeat planner schedule time")
 
             computed_rewards = await get_rewards_mas_day(rolls_number=100)
 
             heartbeat_list = []
             heartbeat_list.append(
-                "📚 <b>MASSA network info:</b><\n>"
-                f" 👥 Total stakers: <b>{app_globals.massa_network['values'].get('total_stakers', '?'):,}</b><\n>"
-                f" 🗞 Total staked rolls: <b>{app_globals.massa_network['values'].get('total_staked_rolls', '?'):,}</b><\n>"
-                f"🪙 Estimated rewards for 100 Rolls ≈ <b>{computed_rewards:,} MAS / Day</b><\n>"
-                f"👁 Info updated: {await get_last_seen(last_time=app_globals.massa_network['values'].get('last_updated'))}<\n>"
+                "📚 <b>MASSA network info:</b>"
+                f" 👥 Total stakers: <b>{app_globals.massa_network['values'].get('total_stakers', '?'):,}</b>"
+                f" 🗞 Total staked rolls: <b>{app_globals.massa_network['values'].get('total_staked_rolls', '?'):,}</b>"
+                f"🪙 Estimated rewards for 100 Rolls ≈ <b>{computed_rewards:,} MAS / Day</b>"
+                f"👁 Info updated: {await get_last_seen(last_time=app_globals.massa_network['values'].get('last_updated'))}"
             )
 
             # Résumé global
@@ -50,7 +48,7 @@ async def heartbeat() -> None:
             online_nodes = sum(1 for n in app_globals.app_results.values() if n.get('last_status') == True)
             offline_nodes = total_nodes - online_nodes
             heartbeat_list.append(
-                f"<\n>🖥️ <b>Node summary:</b> {online_nodes} online / {offline_nodes} offline (total {total_nodes})<\n>"
+                f"🖥️ <b>Node summary:</b> {online_nodes} online / {offline_nodes} offline (total {total_nodes})"
             )
 
             # Séparer nodes online/offline
@@ -58,15 +56,15 @@ async def heartbeat() -> None:
             nodes_offline = [n for n in app_globals.app_results if app_globals.app_results[n].get('last_status') != True]
 
             if total_nodes == 0:
-                heartbeat_list.append("⭕ Node list is empty<\n>")
+                heartbeat_list.append("⭕ Node list is empty")
 
             # Section ONLINE
             if nodes_online:
-                heartbeat_list.append("<\n>🟢 <b>Online nodes:</b>")
+                heartbeat_list.append("\n🟢 <b>Online nodes:</b>")
                 for node_name in nodes_online:
                     node = app_globals.app_results[node_name]
-                    heartbeat_list.append(f"<\n>🏠 <b>Node:</b> \"{node_name}\"")
-                    heartbeat_list.append(f"📍 {node.get('url', '?')}")
+                    heartbeat_list.append(f"\n🏠 <b>Node:</b> \"{node_name}\"")
+                    heartbeat_list.append(f"\n📍 {node.get('url', '?')}")
                     version = node.get('version', '?')
                     node_ip = node.get('node_ip', '?')
                     chain_id = node.get('last_chain_id', '?')
@@ -87,23 +85,23 @@ async def heartbeat() -> None:
                     stale_blocks = consensus.get('stale_block_count', '?')
 
                     heartbeat_list.append(
-                        f"🌿 <b>Status:</b> Online (uptime {node_uptime}, last update {last_seen})"
+                        f"\n🌿 <b>Status:</b> Online (uptime {node_uptime}, last update {last_seen})"
                     )
                     heartbeat_list.append(
-                        f"🔢 Version: <b>{version}</b> | Chain ID: <b>{chain_id}</b> | IP: <b>{node_ip}</b>"
+                        f"\n🔢 Version: <b>{version}</b> | Chain ID: <b>{chain_id}</b> | IP: <b>{node_ip}</b>"
                     )
                     heartbeat_list.append(
-                        f"🌐 Network: {peers} peers, {in_con} in / {out_con} out, 🚫 {banned} banned"
+                        f"\n🌐 Network: {peers} peers, {in_con} in / {out_con} out, 🚫 {banned} banned"
                     )
                     heartbeat_list.append(
-                        f"⛓️ Consensus: {final_blocks} final / {stale_blocks} stale blocks"
+                        f"\n⛓️ Consensus: {final_blocks} final / {stale_blocks} stale blocks"
                     )
 
                     num_wallets = len(node['wallets'])
                     if num_wallets == 0:
-                        heartbeat_list.append("⭕ No wallets attached<\n>")
+                        heartbeat_list.append("\n⭕ No wallets attached")
                     else:
-                        heartbeat_list.append(f"👛 {num_wallets} wallet(s) attached:")
+                        heartbeat_list.append(f"\n👛 {num_wallets} wallet(s) attached:")
                         wallet_lines = []
                         for wallet_address in node['wallets']:
                             w = node['wallets'][wallet_address]
@@ -120,25 +118,25 @@ async def heartbeat() -> None:
                                 wallet_lines.append(
                                     format_wallet_line_unknown(short_addr, explorer_url)
                                 )
-                        heartbeat_list.append("<\n>".join(wallet_lines))
-                    heartbeat_list.append("<\n>")
+                        heartbeat_list.append("\n".join(wallet_lines))
+                    heartbeat_list.append("\n")
 
             # Section OFFLINE
             if nodes_offline:
-                heartbeat_list.append("<\n>🔴 <b>Offline nodes:</b>")
+                heartbeat_list.append("\n🔴 <b>Offline nodes:</b>")
                 for node_name in nodes_offline:
                     node = app_globals.app_results[node_name]
-                    heartbeat_list.append(f"<\n>🏠 <b>Node:</b> \"{node_name}\"")
-                    heartbeat_list.append(f"📍 {node.get('url', '?')}")
+                    heartbeat_list.append(f"\n🏠 <b>Node:</b> \"{node_name}\"")
+                    heartbeat_list.append(f"\n📍 {node.get('url', '?')}")
                     last_seen = await get_last_seen(node.get('last_update'))
-                    heartbeat_list.append(f"☠️ <b>Status:</b> Offline (last seen {last_seen})")
+                    heartbeat_list.append(f"\n☠️ <b>Status:</b> Offline (last seen {last_seen})")
                     version = node.get('version', '?')
                     node_ip = node.get('node_ip', '?')
                     chain_id = node.get('last_chain_id', '?')
                     heartbeat_list.append(
-                        f"🔢 Version: <b>{version}</b> | Chain ID: <b>{chain_id}</b> | IP: <b>{node_ip}</b>"
+                        f"\n🔢 Version: <b>{version}</b> | Chain ID: <b>{chain_id}</b> | IP: <b>{node_ip}</b>"
                     )
-                    heartbeat_list.append("⭕ No wallets info available<\n>")
+                    heartbeat_list.append("\n⭕ No wallets info available")
 
             # Compose le message complet
             message_html = (
@@ -155,9 +153,9 @@ async def heartbeat() -> None:
             )
 
     except BaseException as E:
-        logger.error(f"Exception {str(E)} ({E})")
+        logger.error(f"[HEARTBEAT] Exception {str(E)} ({E})")
     finally:
-        logger.error("<- Quit heartbeat")
+        logger.error(f"[HEARTBEAT] <- Quit heartbeat")
 
     return
 

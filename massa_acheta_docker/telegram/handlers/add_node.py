@@ -22,7 +22,7 @@ router = Router()
 @router.message(Command("add_node"))
 @logger.catch
 async def cmd_add_node(message: Message, state: FSMContext) -> None:
-    logger.debug("-> cmd_add_node")
+    logger.debug(f"[ADD_NODE] -> cmd_add_node")
     if message.chat.id != app_globals.ACHETA_CHAT:
         return
     await state.set_state(NodeAdder.waiting_node_name)
@@ -34,7 +34,7 @@ async def cmd_add_node(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[ADD_NODE] Could not send message: {e}")
         await state.clear()
 
 @router.message(NodeAdder.waiting_node_name, F.text)
@@ -67,7 +67,7 @@ async def input_nodename_to_add(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Could not send message: {e}")
+        logger.error(f"[ADD_NODE] Could not send message: {e}")
         await state.clear()
 
 @router.message(NodeAdder.waiting_node_url, F.text.startswith("http"))
@@ -81,7 +81,7 @@ async def add_node(message: Message, state: FSMContext) -> None:
         node_name = user_state['node_name']
         node_url = message.text.strip()
     except Exception as e:
-        logger.error(f"Cannot read state: {e}")
+        logger.error(f"[ADD_NODE] Cannot read state: {e}")
         await state.clear()
         return
 
@@ -112,7 +112,7 @@ async def add_node(message: Message, state: FSMContext) -> None:
                                 "last_result": {},
                                 "added_automatically": True
                             }
-                            logger.info(f"Wallet local {local_wallet} ajouté automatiquement pour le nœud {node_name}")
+                            logger.info(f"[ADD_NODE] Wallet local {local_wallet} ajouté automatiquement pour le nœud {node_name}")
                             auto_wallet_msg = (
                                 f"\n👛 Wallet local détecté et ajouté à la surveillance : <code>{local_wallet}</code>"
                             )
@@ -125,7 +125,7 @@ async def add_node(message: Message, state: FSMContext) -> None:
                 else:
                     auto_wallet_msg = "\nℹ️ Impossible d’obtenir d’info wallet local via /wallet_info."
             except Exception as e:
-                logger.warning(f"Erreur lors de la récupération du wallet local via /wallet_info pour le nœud {node_name}: {e}")
+                logger.warning(f"[ADD_NODE] Erreur lors de la récupération du wallet local via /wallet_info pour le nœud {node_name}: {e}")
                 auto_wallet_msg = "\nℹ️ Erreur lors de la récupération du wallet local."
 
             save_app_results()
@@ -141,7 +141,7 @@ async def add_node(message: Message, state: FSMContext) -> None:
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     except Exception as e:
-        logger.error(f"Cannot add node: {e}")
+        logger.error(f"[ADD_NODE] Cannot add node: {e}")
         await message.reply(
             text=(
                 f"‼️ Error: Could not add node <b>{node_name}</b> with API URL {node_url}\n"
@@ -159,4 +159,4 @@ async def add_node(message: Message, state: FSMContext) -> None:
             async with app_globals.results_lock:
                 await asyncio.gather(check_node(node_name=node_name))
     except Exception as e:
-        logger.warning(f"check_node failed after node add: {e}")
+        logger.warning(f"[ADD_NODE] check_node failed after node add: {e}")

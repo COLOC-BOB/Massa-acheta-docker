@@ -30,27 +30,27 @@ tg_dp = None
 
 app_results_obj = Path(app_config['service']['results_path'])
 if app_results_obj.exists():
-    logger.info(f"Loading results from '{app_results_obj}' file...")
+    logger.info(f"[APP_GLOBALS] Loading results from '{app_results_obj}' file...")
 
     with open(file=app_results_obj, mode="rt") as input_results:
         try:
             app_results = json.load(fp=input_results)
         except BaseException as E:
-            logger.critical(f"Cannot load results from '{app_results_obj}' ({str(E)})")
+            logger.critical(f"[APP_GLOBALS] Cannot load results from '{app_results_obj}' ({str(E)})")
             sys_exit(1)
         else:
-            logger.info(f"Successfully loaded results from '{app_results_obj}' file!")
+            logger.info(f"[APP_GLOBALS] Successfully loaded results from '{app_results_obj}' file!")
 else:
-    logger.warning(f"No results file '{app_results_obj}' exists. Trying to create...")
+    logger.warning(f"[APP_GLOBALS] No results file '{app_results_obj}' exists. Trying to create...")
 
     try:
         if not save_app_results():
             raise Exception
     except BaseException as E:
-        logger.critical(f"Cannot create '{app_results_obj}' file. Exiting...")
+        logger.critical(f"[APP_GLOBALS] Cannot create '{app_results_obj}' file. Exiting...")
         sys_exit(1)
     else:
-        logger.info(f"Successfully created empty '{app_results_obj}' file")
+        logger.info(f"[APP_GLOBALS] Successfully created empty '{app_results_obj}' file")
 
 for node_name, node_data in app_results.items():
     node_data.setdefault('last_status', "unknown")
@@ -100,14 +100,14 @@ massa_network['stat'] = deque(
 # --- Restore stat values ---
 app_stat_obj = Path(app_config['service']['stat_path'])
 if app_stat_obj.exists():
-    logger.info(f"Loading stat from '{app_stat_obj}' file...")
+    logger.info(f"[APP_GLOBALS] Loading stat from '{app_stat_obj}' file...")
     try:
         with open(file=app_stat_obj, mode="rt") as input_stat:
             app_stat = json.load(fp=input_stat)
     except BaseException as E:
-        logger.error(f"Cannot load stat from '{app_stat_obj}': ({str(E)})")
+        logger.error(f"[APP_GLOBALS] Cannot load stat from '{app_stat_obj}': ({str(E)})")
     else:
-        logger.info(f"Loaded app_stat from '{app_stat_obj}' successfully")
+        logger.info(f"[APP_GLOBALS] Loaded app_stat from '{app_stat_obj}' successfully")
         try:
             for node_name in app_results:
                 for wallet_address in app_results[node_name]['wallets']:
@@ -115,22 +115,22 @@ if app_stat_obj.exists():
                     if wallet_stat and type(wallet_stat) == list and len(wallet_stat) > 0:
                         for measure in wallet_stat:
                             app_results[node_name]['wallets'][wallet_address]['stat'].append(measure)
-                    logger.info(f"Restored {len(app_results[node_name]['wallets'][wallet_address]['stat'])} measures for wallet '{wallet_address}'@'{node_name}'")
+                    logger.info(f"[APP_GLOBALS] Restored {len(app_results[node_name]['wallets'][wallet_address]['stat'])} measures for wallet '{wallet_address}'@'{node_name}'")
         except BaseException as E:
-            logger.error(f"Cannot restore app_result stat ({str(E)})")
+            logger.error(f"[APP_GLOBALS] Cannot restore app_result stat ({str(E)})")
         else:
-            logger.info(f"Restored app_results stat successfully")
+            logger.info(f"[APP_GLOBALS] Restored app_results stat successfully")
         try:
             massa_network_stat = app_stat['massa_network'].get("stat", None)
             if massa_network_stat and type(massa_network_stat) == list and len(massa_network_stat) > 0:
                 for measure in massa_network_stat:
                     if type(measure) == dict:
                         massa_network['stat'].append(measure)
-            logger.info(f"Restored {len(massa_network['stat'])} measures for massa_network")
+            logger.info(f"[APP_GLOBALS] Restored {len(massa_network['stat'])} measures for massa_network")
         except BaseException as E:
-            logger.error(f"Cannot restore massa_network stat ({str(E)})")
+            logger.error(f"[APP_GLOBALS] Cannot restore massa_network stat ({str(E)})")
         else:
-            logger.info(f"Restored massa_network stat successfully")
+            logger.info(f"[APP_GLOBALS] Restored massa_network stat successfully")
 
 # --- Telegram bot configuration (pour usage privé) ---
 ACHETA_KEY = os.getenv("ACHETA_KEY")  # Placer ta clé dans .env
@@ -148,7 +148,7 @@ def fetch_latest_github_release():
         data = response.json()
         return data.get("tag_name", "")
     except Exception as e:
-        logger.warning(f"Could not fetch latest GitHub release: {e}")
+        logger.warning(f"[APP_GLOBALS] Could not fetch latest GitHub release: {str(e)}")
         return ""
     
 local_acheta_release = "v2.0.0"
@@ -158,16 +158,14 @@ latest_acheta_release = fetch_latest_github_release()
 deferred_credits = {}
 deferred_credits_obj = Path(app_config['service']['deferred_credits_path'])
 if not deferred_credits_obj.exists():
-    logger.warning(f"No deferred_credits file '{deferred_credits_obj}' exists. Skipping...")
-else:
-    logger.info(f"Loading deferred_credits from '{deferred_credits_obj}' file...")
+    logger.warning(f"[APP_GLOBALS] No deferred_credits file '{deferred_credits_obj}' exists. Skipping...")
     with open(file=deferred_credits_obj, mode="rt") as input_deferred_credits:
         try:
             deferred_credits = json.load(fp=input_deferred_credits)
         except BaseException as E:
-            logger.error(f"Cannot load deferred_credits from '{deferred_credits_obj}' ({str(E)})")
+            logger.error(f"[APP_GLOBALS] Cannot load deferred_credits from '{deferred_credits_obj}' ({str(E)})")
         else:
-            logger.info(f"Successfully loaded deferred_credits from '{deferred_credits_obj}' file!")
+            logger.info(f"[APP_GLOBALS] Successfully loaded deferred_credits from '{deferred_credits_obj}' file!")
 
 if __name__ == "__main__":
     pass
