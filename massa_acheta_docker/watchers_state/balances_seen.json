@@ -1,1 +1,56 @@
-{}
+{
+  "My node": {
+    "AU12eU7k2YSBNX7maKB8kzzvHfdfdr8YKSG2Bv9nUg9HRFvpsaS79": [
+      {
+        "datetime": "2025-06-26T19:55:12.018355",
+        "balance": 94.117042285
+      },
+      {
+        "datetime": "2025-06-26T19:55:44.231477",
+        "balance": 94.117042285
+      }
+    ]
+  },
+  "Mainnet-public": {
+    "AU16raXifo3FExijWrhUBLBneaHnWGicWbShgyXgAKB1bnj1yLvH": [
+      {
+        "datetime": "2025-06-26T19:55:12.431626",
+        "balance": 689.96840328
+      },
+      {
+        "datetime": "2025-06-26T19:55:44.449686",
+        "balance": 689.96840328
+      }
+    ],
+    "AU122Em8qkqegdLb1eyH8rdkSCNEf7RZLeTJve4Q2inRPGiTJ2xNv": [
+      {
+        "datetime": "2025-06-26T19:55:12.959485",
+        "balance": 89.235752249
+      },
+      {
+        "datetime": "2025-06-26T19:55:44.715755",
+        "balance": 90.043615582
+      }
+    ],
+    "AU144mAyhGCFtNuVyCqdYAund9PZW5wibXihSHN3TZZ31dpGsNfE": [
+      {
+        "datetime": "2025-06-26T19:55:13.771809",
+        "balance": 1.0
+      },
+      {
+        "datetime": "2025-06-26T19:55:45.110386",
+        "balance": 1.0
+      }
+    ],
+    "AU1jmrHhqzW6GCxdM3K9tqktrkCESJJxsWWC9kM5F5KDS751Tt8B": [
+      {
+        "datetime": "2025-06-26T19:55:14.161485",
+        "balance": 262.936097355
+      },
+      {
+        "datetime": "2025-06-26T19:55:45.656515",
+        "balance": 262.936097355
+      }
+    ]
+  }
+}

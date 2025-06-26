@@ -3,7 +3,7 @@ from loguru import logger
 logger.add(
     "main.log",
     format="\"{time}\", \"{level}\", \"{file}:{line}\", \"{module}:{function}\", \"{message}\"",
-    level="INFO",
+    level="WARNING",
     rotation="1 week",
     compression="zip",
     enqueue=True,

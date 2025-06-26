@@ -1,8 +1,8 @@
 {
-  "rolls": true,
-  "blocks": true,
-  "balance": true,
-  "operations": true,
-  "deferred_credits": true,
-  "missed_blocks": true
+  "rolls": false,
+  "blocks": false,
+  "balance": false,
+  "operations": false,
+  "deferred_credits": false,
+  "missed_blocks": false
 }
