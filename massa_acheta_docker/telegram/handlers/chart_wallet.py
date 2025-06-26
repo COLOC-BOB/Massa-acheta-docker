@@ -131,11 +131,13 @@ async def show_wallet_chart(message: Message, state: FSMContext, node_name: str,
 
     try:
         stats = app_globals.app_results[node_name]['wallets'][wallet_address].get("stat", {})
-        # Extraction des données triées par cycle
-        cycles, balances, rolls, total_rolls, ok_blocks, nok_blocks = [], [], [], [], [], []
+
+        # Extraction brut
+        cycles = []
+        balances, rolls, total_rolls, ok_blocks, nok_blocks = [], [], [], [], []
         est_rewards_per_day, est_blocks_per_cycle = [], []
         for measure in stats:
-            cycles.append(str(measure.get("cycle", 0)))
+            cycles.append(int(measure.get("cycle", 0)))
             balances.append(measure.get("balance", 0))
             rolls.append(measure.get("rolls", 0))
             total_rolls.append(measure.get("total_rolls", 0))
@@ -145,8 +147,6 @@ async def show_wallet_chart(message: Message, state: FSMContext, node_name: str,
             est_blocks_per_cycle.append(await get_rewards_blocks_cycle(measure.get("rolls", 0), measure.get("total_rolls", 0)))
 
         logger.debug(f"cycles={cycles}")
-        logger.debug(f"rolls={rolls}")
-        logger.debug(f"balances={balances}")
 
         if not cycles:
             await message.reply(
@@ -160,198 +160,192 @@ async def show_wallet_chart(message: Message, state: FSMContext, node_name: str,
 
         short_addr = await get_short_address(wallet_address)
 
-        # Si 1 seul point, bar chart au lieu de line chart (évite le bug visuel)
-        if len(cycles) < 2:
-            staking_chart_config = {
-                "type": "bar",
-                "data": {
-                    "labels": cycles,
-                    "datasets": [
-                        {
-                            "label": "Rolls staked",
-                            "backgroundColor": "Teal",
-                            "data": rolls,
-                        },
-                        {
-                            "label": "Final balance",
-                            "backgroundColor": "FireBrick",
-                            "data": balances,
-                        }
-                    ]
-                },
-                "options": {
-                    "title": {
-                        "display": True,
-                        "text": f"Wallet: {short_addr} (single value)"
-                    }
-                }
-            }
-        else:
-            staking_chart_config = {
-                "type": "line",
-                "data": {
-                    "labels": cycles,
-                    "datasets": [
-                        {
-                            "label": "Rolls staked",
-                            "yAxisID": "rolls",
-                            "lineTension": 0.4,
-                            "fill": False,
-                            "borderColor": "Teal",
-                            "borderWidth": 2,
-                            "pointRadius": 2,
-                            "data": rolls
-                        },
-                        {
-                            "label": "Final balance",
-                            "yAxisID": "balance",
-                            "lineTension": 0.4,
-                            "fill": False,
-                            "borderColor": "FireBrick",
-                            "borderWidth": 2,
-                            "pointRadius": 2,
-                            "data": balances
-                        }
-                    ]
-                },
-                "options": {
-                    "title": {
-                        "display": True,
-                        "text": f"Wallet: {short_addr}"
-                    },
-                    "scales": {
-                        "yAxes": [
-                            {
-                                "id": "rolls",
-                                "display": True,
-                                "position": "left",
-                                "ticks": {"fontColor": "Teal"},
-                                "gridLines": {"drawOnChartArea": False}
-                            },
-                            {
-                                "id": "balance",
-                                "display": True,
-                                "position": "right",
-                                "ticks": {"fontColor": "FireBrick"},
-                                "gridLines": {"drawOnChartArea": True}
-                            }
-                        ]
-                    }
-                }
-            }
+        # --- ALIGNEMENT X LINÉAIRE ---
+        cycle_min, cycle_max = min(cycles), max(cycles)
+        all_cycles = list(range(cycle_min, cycle_max + 1))
 
-                # ----------- CORRECTIF blocks_chart_config ----------------
-        if len(cycles) < 2:
-            # Fallback: Simple bar chart si 1 seul point
-            blocks_chart_config = {
-                "type": "bar",
-                "data": {
-                    "labels": cycles,
-                    "datasets": [
-                        {
-                            "label": "OK blocks",
-                            "backgroundColor": "LightSeaGreen",
-                            "data": ok_blocks
-                        },
-                        {
-                            "label": "nOK blocks",
-                            "backgroundColor": "LightSalmon",
-                            "data": nok_blocks
-                        },
-                        {
-                            "label": "Est. MAS / Day",
-                            "backgroundColor": "DarkViolet",
-                            "data": est_rewards_per_day
-                        },
-                        {
-                            "label": "Est. Blocks / Cycle",
-                            "backgroundColor": "lightgray",
-                            "data": est_blocks_per_cycle
-                        }
-                    ]
-                },
-                "options": {
-                    "title": {
-                        "display": True,
-                        "text": f"Wallet: {short_addr} (single value)"
-                    }
-                }
-            }
-        else:
-            # Version normale (multi-points)
-            blocks_chart_config = {
-                "type": "bar",
-                "data": {
-                    "labels": cycles,
-                    "datasets": [
-                        {
-                            "type": "line",
-                            "label": "Est. MAS / Day",
-                            "yAxisID": "earnings",
-                            "lineTension": 0.4,
-                            "fill": False,
-                            "borderColor": "DarkViolet",
-                            "borderWidth": 2,
-                            "pointRadius": 2,
-                            "data": est_rewards_per_day
-                        },
-                        {
-                            "type": "bar",
-                            "label": "OK blocks",
-                            "yAxisID": "blocks",
-                            "backgroundColor": "LightSeaGreen",
-                            "data": ok_blocks
-                        },
-                        {
-                            "type": "bar",
-                            "label": "nOK blocks",
-                            "yAxisID": "blocks",
-                            "backgroundColor": "LightSalmon",
-                            "data": nok_blocks
-                        },
-                        {
-                            "type": "line",
-                            "label": "Est. Blocks / Cycle",
-                            "yAxisID": "blocks",
-                            "lineTension": 0.4,
-                            "fill": True,
-                            "borderColor": "lightgray",
-                            "backgroundColor": "rgba(220, 220, 220, 0.4)",
-                            "borderWidth": 0,
-                            "pointRadius": 0,
-                            "data": est_blocks_per_cycle
-                        }
-                    ]
-                },
-                "options": {
-                    "title": {
-                        "display": True,
-                        "text": f"Wallet: {short_addr}"
-                    },
-                    "scales": {
-                        "yAxes": [
-                            {
-                                "id": "blocks",
-                                "display": True,
-                                "position": "left",
-                                "stacked": True,
-                                "ticks": {"min": 0, "fontColor": "LightSeaGreen"},
-                                "gridLines": {"drawOnChartArea": False}
-                            },
-                            {
-                                "id": "earnings",
-                                "display": True,
-                                "position": "right",
-                                "stacked": False,
-                                "ticks": {"fontColor": "DarkViolet"},
-                                "gridLines": {"drawOnChartArea": True}
-                            }
-                        ],
-                        "xAxes": [{"stacked": True}]
-                    }
-                }
-            }
+        # Map cycle → index
+        idx_map = {c: i for i, c in enumerate(cycles)}
 
+        def fill(data):
+            # Remplit avec 0 ou None si absent
+            return [data[idx_map[c]] if c in idx_map else 0 for c in all_cycles]
+
+        # Séries Y linéaires
+        balances_filled = fill(balances)
+        rolls_filled = fill(rolls)
+        ok_blocks_filled = fill(ok_blocks)
+        nok_blocks_filled = fill(nok_blocks)
+        est_rewards_per_day_filled = fill(est_rewards_per_day)
+        est_blocks_per_cycle_filled = fill(est_blocks_per_cycle)
+
+        # Pour Chart.js mode "x/y"
+        ok_blocks_points = [{"x": c, "y": ok_blocks_filled[i]} for i, c in enumerate(all_cycles)]
+        nok_blocks_points = [{"x": c, "y": nok_blocks_filled[i]} for i, c in enumerate(all_cycles)]
+        est_rewards_points = [{"x": c, "y": est_rewards_per_day_filled[i]} for i, c in enumerate(all_cycles)]
+        est_blocks_cycle_points = [{"x": c, "y": est_blocks_per_cycle_filled[i]} for i, c in enumerate(all_cycles)]
+
+        # ---- Chart "blocks" avec axe linéaire (plus de category) ----
+        blocks_chart_config = {
+            "type": "bar",
+            "data": {
+                "datasets": [
+                    {
+                        "type": "line",
+                        "label": "Est. MAS / Day",
+                        "yAxisID": "earnings",
+                        "lineTension": 0.3,
+                        "fill": True,
+                        "backgroundColor": "rgba(150,0,255,0.1)",
+                        "borderColor": "DarkViolet",
+                        "borderWidth": 2,
+                        "pointRadius": 1,
+                        "data": est_rewards_points,
+                        "order": 1
+                    },
+                    {
+                        "type": "bar",
+                        "label": "OK blocks",
+                        "yAxisID": "blocks",
+                        "backgroundColor": "rgba(50,200,150,0.7)",
+                        "data": ok_blocks_points,
+                        "categoryPercentage": 0.7,
+                        "barPercentage": 0.8,
+                        "order": 2
+                    },
+                    {
+                        "type": "bar",
+                        "label": "nOK blocks",
+                        "yAxisID": "blocks",
+                        "backgroundColor": "rgba(250,150,100,0.5)",
+                        "data": nok_blocks_points,
+                        "categoryPercentage": 0.7,
+                        "barPercentage": 0.8,
+                        "order": 2
+                    },
+                    {
+                        "type": "line",
+                        "label": "Est. Blocks / Cycle",
+                        "yAxisID": "blocks",
+                        "lineTension": 0.3,
+                        "fill": False,
+                        "borderColor": "gray",
+                        "borderWidth": 1,
+                        "pointRadius": 0,
+                        "data": est_blocks_cycle_points,
+                        "order": 0
+                    }
+                ]
+            },
+            "options": {
+                "title": {
+                    "display": True,
+                    "text": f"Wallet: {short_addr}"
+                },
+                "scales": {
+                    "xAxes": [{
+                        "type": "linear",
+                        "position": "bottom",
+                        "ticks": {
+                            "min": cycle_min,
+                            "max": cycle_max,
+                            "stepSize": 1,
+                            "fontSize": 10,
+                            "callback": "function(value,index,values){ return Math.round(value); }",
+                            "autoSkip": True,
+                            "maxTicksLimit": 15
+                        },
+                        "scaleLabel": {
+                            "display": True,
+                            "labelString": "Cycle"
+                        }
+                    }],
+                    "yAxes": [
+                        {
+                            "id": "blocks",
+                            "display": True,
+                            "position": "left",
+                            "stacked": True,
+                            "ticks": {"min": 0, "fontColor": "#228877"},
+                            "gridLines": {"drawOnChartArea": False}
+                        },
+                        {
+                            "id": "earnings",
+                            "display": True,
+                            "position": "right",
+                            "stacked": False,
+                            "ticks": {"fontColor": "DarkViolet"},
+                            "gridLines": {"drawOnChartArea": True}
+                        }
+                    ]
+                },
+                "legend": {
+                    "labels": {
+                        "fontSize": 12
+                    }
+                },
+                "tooltips": {
+                    "mode": "index",
+                    "intersect": False
+                }
+            }
+        }
+
+        # Pour le staking_chart, tu peux garder l'ancien code si tu veux du "category",
+        # ou faire la même chose (axe linéaire) si besoin !
+
+        staking_chart_config = {
+            "type": "line",
+            "data": {
+                "labels": [str(c) for c in all_cycles],
+                "datasets": [
+                    {
+                        "label": "Rolls staked",
+                        "yAxisID": "rolls",
+                        "lineTension": 0.4,
+                        "fill": False,
+                        "borderColor": "Teal",
+                        "borderWidth": 2,
+                        "pointRadius": 2,
+                        "data": rolls_filled
+                    },
+                    {
+                        "label": "Final balance",
+                        "yAxisID": "balance",
+                        "lineTension": 0.4,
+                        "fill": False,
+                        "borderColor": "FireBrick",
+                        "borderWidth": 2,
+                        "pointRadius": 2,
+                        "data": balances_filled
+                    }
+                ]
+            },
+            "options": {
+                "title": {
+                    "display": True,
+                    "text": f"Wallet: {short_addr}"
+                },
+                "scales": {
+                    "yAxes": [
+                        {
+                            "id": "rolls",
+                            "display": True,
+                            "position": "left",
+                            "ticks": {"fontColor": "Teal"},
+                            "gridLines": {"drawOnChartArea": False}
+                        },
+                        {
+                            "id": "balance",
+                            "display": True,
+                            "position": "right",
+                            "ticks": {"fontColor": "FireBrick"},
+                            "gridLines": {"drawOnChartArea": True}
+                        }
+                    ]
+                }
+            }
+        }
 
         # Génération QuickChart
         staking_chart = QuickChart()
@@ -369,17 +363,17 @@ async def show_wallet_chart(message: Message, state: FSMContext, node_name: str,
         blocks_chart_url = blocks_chart.get_url()
 
         caption_staking = (
-            f"Cycles collected: {len(cycles):,}\n"
-            f"Current balance: {balances[-1] if balances else 0:,} MAS\n"
-            f"Number of rolls: {rolls[-1] if rolls else 0:,}\n"
-            f"{'⚠️ Not enough data for a curve.' if len(cycles) < 2 else ''}\n"
+            f"Cycles collected: {len(all_cycles):,}\n"
+            f"Current balance: {balances_filled[-1] if balances_filled else 0:,} MAS\n"
+            f"Number of rolls: {rolls_filled[-1] if rolls_filled else 0:,}\n"
+            f"{'⚠️ Not enough data for a curve.' if len(all_cycles) < 2 else ''}\n"
             f"Wallet: <code>{short_addr}</code>"
         )
         caption_blocks = (
-            f"Cycles collected: {len(cycles):,}\n"
-            f"Operated blocks: {sum(ok_blocks)+sum(nok_blocks):,}\n"
-            f"Estimated Blocks / Cycle: {round(sum(est_blocks_per_cycle)/len(est_blocks_per_cycle), 2) if est_blocks_per_cycle else 0}\n"
-            f"Estimated Rewards / Cycle: {round(sum(est_rewards_per_day)/len(est_rewards_per_day), 2) if est_rewards_per_day else 0}\n"
+            f"Cycles collected: {len(all_cycles):,}\n"
+            f"Operated blocks: {sum(ok_blocks_filled)+sum(nok_blocks_filled):,}\n"
+            f"Estimated Blocks / Cycle: {round(sum(est_blocks_per_cycle_filled)/len(est_blocks_per_cycle_filled), 2) if est_blocks_per_cycle_filled else 0}\n"
+            f"Estimated Rewards / Cycle: {round(sum(est_rewards_per_day_filled)/len(est_rewards_per_day_filled), 2) if est_rewards_per_day_filled else 0}\n"
             f"Wallet: <code>{short_addr}</code>"
         )
 
@@ -407,4 +401,3 @@ async def show_wallet_chart(message: Message, state: FSMContext, node_name: str,
             request_timeout=app_config['telegram']['sending_timeout_sec']
         )
     await state.clear()
-

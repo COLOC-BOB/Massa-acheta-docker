@@ -10,7 +10,6 @@ from aiogram.fsm.state import State, StatesGroup
 from app_config import app_config
 import app_globals
 from remotes.node import check_node
-from remotes_utils import save_app_results, pull_http_api
 from telegram.menu_utils import build_menu_keyboard
 
 class NodeAdder(StatesGroup):
@@ -85,9 +84,6 @@ async def add_node(message: Message, state: FSMContext) -> None:
         await state.clear()
         return
 
-    local_wallet = None
-    auto_wallet_msg = ""
-
     try:
         # Ajout du node à la config
         async with app_globals.results_lock:
@@ -99,42 +95,11 @@ async def add_node(message: Message, state: FSMContext) -> None:
                 'last_result': {"unknown": "Never updated before"},
                 'wallets': {}
             }
-
-            # Essaye de récupérer le wallet local via /wallet_info
-            try:
-                wallet_info = await pull_http_api(node_url, "wallet_info")
-                if wallet_info and "result" in wallet_info:
-                    local_wallet = wallet_info["result"].get("address")
-                    if local_wallet:
-                        if local_wallet not in app_globals.app_results[node_name]['wallets']:
-                            app_globals.app_results[node_name]['wallets'][local_wallet] = {
-                                "last_status": None,
-                                "last_result": {},
-                                "added_automatically": True
-                            }
-                            logger.info(f"[ADD_NODE] Wallet local {local_wallet} ajouté automatiquement pour le nœud {node_name}")
-                            auto_wallet_msg = (
-                                f"\n👛 Wallet local détecté et ajouté à la surveillance : <code>{local_wallet}</code>"
-                            )
-                        else:
-                            auto_wallet_msg = (
-                                f"\n👛 Wallet local déjà surveillé : <code>{local_wallet}</code>"
-                            )
-                    else:
-                        auto_wallet_msg = "\nℹ️ Aucun wallet local n'a été détecté sur ce nœud."
-                else:
-                    auto_wallet_msg = "\nℹ️ Impossible d’obtenir d’info wallet local via /wallet_info."
-            except Exception as e:
-                logger.warning(f"[ADD_NODE] Erreur lors de la récupération du wallet local via /wallet_info pour le nœud {node_name}: {e}")
-                auto_wallet_msg = "\nℹ️ Erreur lors de la récupération du wallet local."
-
-            save_app_results()
         await message.reply(
             text=(
                 f"✅ Successfully added node <b>{node_name}</b> with API URL: <code>{node_url}</code>\n"
                 "👁 Please note that bot will update info for this node a bit later.\n"
                 "☝️ You can add wallet to node using /add_wallet command."
-                f"{auto_wallet_msg}"
             ),
             parse_mode="HTML",
             reply_markup=build_menu_keyboard(),

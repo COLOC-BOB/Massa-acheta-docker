@@ -1,16 +1,4 @@
 # massa_acheta_docker/main.py
-from loguru import logger
-logger.add(
-    "main.log",
-    format="\"{time}\", \"{level}\", \"{file}:{line}\", \"{module}:{function}\", \"{message}\"",
-    level="WARNING",
-    rotation="1 week",
-    compression="zip",
-    enqueue=True,
-    backtrace=True,
-    diagnose=True
-)
-
 import asyncio
 from pathlib import Path
 from sys import exit as sys_exit
@@ -48,6 +36,18 @@ from watchers.rolls import watch_rolls
 from watchers.balance import watch_balance
 from watchers.missed_blocks import watch_missed_blocks
 from watchers.operations import watch_operations
+
+from loguru import logger
+logger.add(
+    "main.log",
+    format="\"{time}\", \"{level}\", \"{file}:{line}\", \"{module}:{function}\", \"{message}\"",
+    level="WARNING",
+    rotation="1 week",
+    compression="zip",
+    enqueue=True,
+    backtrace=True,
+    diagnose=True
+)
 
 async def deferred_credits_auto_refresh_loop():
     while True:
