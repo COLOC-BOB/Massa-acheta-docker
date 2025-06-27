@@ -7,12 +7,6 @@ pyvenv.cfg
 deferred_credits.json
 app_results.json
 app_stat.json
-watchers_state/blocks_seen.json
-watchers_state/rolls_seen.json 
-watchers_state/balances_seen.json 
-watchers_state/operations_seen.json
-watchers_state/deferred_credits_seen.json
-watchers_state/watchers_config.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
