@@ -12,15 +12,15 @@ def get_bot_commands() -> list[BotCommand]:
 
 # === 2. Texte du menu (pour /help ou /start) ===
 def build_menu_text() -> str:
-    lines = ["<b>📖 Commandes disponibles :</b>\n>"]
-    lines.append("⦙\n>⦙… /start : Afficher le menu\n>⦙\n>")
+    lines = ["<b>📖 Available commands:</b>\n>"]
+    lines.append("⦙\n>⦙… /start : Show menu\n>⦙\n>")
     for cmd, desc, _ in PRIVATE_COMMANDS:
         if cmd == "/help":
             continue
         lines.append(f"⦙… {cmd} : {desc}\n>⦙\n>")
     lines.append(
-        '👉 <a href="https://github.com/dex2code/massa_acheta/">Plus d\'infos ici</a>\n>'
-        '🎁 Un merci à l\'auteur ? <a href="https://github.com/dex2code/massa_acheta#thank-you">Voir ici</a>'
+        '👉 <a href="https://github.com/dex2code/massa_acheta/">More info here</a>\n>'
+        '🎁 Want to thank the author? <a href="https://github.com/dex2code/massa_acheta#thank-you">See here</a>'
     )
     return ''.join(lines)
 
@@ -32,8 +32,8 @@ async def handle_menu_label(msg: Message, state: FSMContext):
     label = msg.text.strip()
     if label in LABEL_TO_COMMAND:
         cmd = LABEL_TO_COMMAND[label]
-        await dispatch_command(cmd, msg, state)   # <-- exécute le handler correspondant
+        await dispatch_command(cmd, msg, state)
     else:
-        await msg.answer("Commande inconnue. Utilise le menu !", reply_markup=build_menu_keyboard())
+        await msg.answer("Unknown command. Use the menu!", reply_markup=build_menu_keyboard())
   
   

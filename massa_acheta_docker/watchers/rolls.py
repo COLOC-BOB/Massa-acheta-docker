@@ -93,15 +93,15 @@ async def watch_rolls(polling_interval=30):
                     for typ, field in [("actifs", "active_rolls"), ("candidats", "candidate_rolls")]:
                         if prev_measure and new_measure[field] != prev_measure[field]:
                             delta = new_measure[field] - prev_measure[field]
-                            direction = "gain" if delta > 0 else "perte"
+                            direction = "increase" if delta > 0 else "decrease"
                             emoji = "🟢" if delta > 0 else "🔴"
                             msg = (
-                                f"{emoji} <b>Changement de rolls {typ}</b>\n"
+                                f"{emoji} <b>{typ.capitalize()} rolls changed</b>\n"
                                 f"👛 Wallet: <code>{wallet_address}</code>\n"
                                 f"🏠 Node: <b>{node_name}</b>\n"
                                 f"🗓 {now_iso}\n"
-                                f"📈 Variation : <b>{direction}</b> de {abs(delta)} roll(s)\n"
-                                f"🎯 Nouveau total : <b>{new_measure[field]}</b> rolls {typ}"
+                                f"📈 Change: <b>{direction}</b> of {abs(delta)} roll(s)\n"
+                                f"🎯 New total: <b>{new_measure[field]}</b> rolls {typ}"
                             )
                             await send_alert(
                                 alert_type="wallet_roll_change",

@@ -74,28 +74,28 @@ def format_operation_details(op_detail):
         amount = tx.get("amount", "-")
         return (
             f"\n💸 <b>Transaction</b>"
-            f"\n➡️ Vers: <code>{to_addr}</code>"
-            f"\n💰 Montant: <b>{amount}</b> MAS"
+            f"\n➡️ To: <code>{to_addr}</code>"
+            f"\n💰 Amount: <b>{amount}</b> MAS"
             f"\n🪙 Fee: <b>{fee}</b> MAS"
-            f"\n⏳ Statut: <b>{op_status}</b>"
+            f"\n⏳ Status: <b>{op_status}</b>"
         )
     elif "RollBuy" in op_types:
         op_type = "RollBuy"
         count = op_types["RollBuy"].get("roll_count", "-")
         return (
-            f"\n🎲 <b>Achat de rolls</b>"
-            f"\n🔢 Quantité: <b>{count}</b>"
+            f"\n🎲 <b>Rolls purchase</b>"
+            f"\n🔢 Quantity: <b>{count}</b>"
             f"\n🪙 Fee: <b>{fee}</b> MAS"
-            f"\n⏳ Statut: <b>{op_status}</b>"
+            f"\n⏳ Status: <b>{op_status}</b>"
         )
     elif "RollSell" in op_types:
         op_type = "RollSell"
         count = op_types["RollSell"].get("roll_count", "-")
         return (
-            f"\n💸 <b>Vente de rolls</b>"
-            f"\n🔢 Quantité: <b>{count}</b>"
+            f"\n💸 <b>Rolls sale</b>"
+            f"\n🔢 Quantity: <b>{count}</b>"
             f"\n🪙 Fee: <b>{fee}</b> MAS"
-            f"\n⏳ Statut: <b>{op_status}</b>"
+            f"\n⏳ Status: <b>{op_status}</b>"
         )
     elif "ExecuteSC" in op_types:
         op_type = "ExecuteSC"
@@ -104,12 +104,12 @@ def format_operation_details(op_detail):
         coins = sc.get("coins", "-")
         data = sc.get("data", "-")
         return (
-            f"\n📜 <b>Déploiement/Exécution SC</b>"
+            f"\n📜 <b>Deploy/Execute SC</b>"
             f"\n🪙 Coins: <b>{coins}</b> MAS"
             f"\n⛽ Max Gas: <b>{max_gas}</b>"
-            f"\n📦 Données: <code>{data}</code>"
+            f"\n📦 Data: <code>{data}</code>"
             f"\n🪙 Fee: <b>{fee}</b> MAS"
-            f"\n⏳ Statut: <b>{op_status}</b>"
+            f"\n⏳ Status: <b>{op_status}</b>"
         )
     elif "CallSC" in op_types:
         op_type = "CallSC"
@@ -120,19 +120,19 @@ def format_operation_details(op_detail):
         max_gas = call.get("max_gas", "-")
         coins = call.get("coins", "-")
         return (
-            f"\n📞 <b>Appel de SC</b>"
+            f"\n📞 <b>SC call</b>"
             f"\n🎯 SC: <code>{target_addr}</code>"
-            f"\n🛠 Fonction: <b>{target_func}</b>"
+            f"\n🛠 Function: <b>{target_func}</b>"
             f"\n🪙 Coins: <b>{coins}</b> MAS"
             f"\n⛽ Max Gas: <b>{max_gas}</b>"
             f"\n🪙 Fee: <b>{fee}</b> MAS"
-            f"\n⏳ Statut: <b>{op_status}</b>"
+            f"\n⏳ Status: <b>{op_status}</b>"
         )
     else:
         return (
-            f"\n🔎 <b>Type inconnu</b> : <code>{op_types}</code>"
+            f"\n🔎 <b>Unknown type</b>: <code>{op_types}</code>"
             f"\n🪙 Fee: <b>{fee}</b> MAS"
-            f"\n⏳ Statut: <b>{op_status}</b>"
+            f"\n⏳ Status: <b>{op_status}</b>"
         )
 
 async def watch_operations(polling_interval=30):
@@ -195,13 +195,13 @@ async def watch_operations(polling_interval=30):
                         op_detail = await get_operation_details(op_id, node_url)
                         dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         message = (
-                            f"📨 <b>Nouvelle opération créée</b>\n"
+                            f"📨 <b>New operation created</b>\n"
                             f"👛 Wallet: <code>{wallet_address}</code>\n"
                             f"🏠 Node: <b>{node_name}</b>\n"
-                            f"🆔 Opération: <code>{op_id}</code>\n"
+                            f"🆔 Operation: <code>{op_id}</code>\n"
                             f"🕒 {dt}\n"
                             f"{format_operation_details(op_detail)}\n"
-                            f"🗂 Ajoutée à l'historique."
+                            f"🗂 Added to history."
                         )
                         await send_alert(
                             alert_type="operation_created",

@@ -96,15 +96,15 @@ async def watch_balance(polling_interval=30):
                     if prev and final_balance != prev["balance"]:
                         now_iso = datetime.now().isoformat()
                         delta = final_balance - prev["balance"]
-                        direction = "Hausse" if delta > 0 else "Baisse"
+                        direction = "Increase" if delta > 0 else "Decrease"
                         emoji = "🟢" if delta > 0 else "🔴"
                         message = (
-                            f"{emoji} <b>Changement de balance détecté</b>\n"
+                            f"{emoji} <b>Balance change detected</b>\n"
                             f"👛 Wallet: <code>{wallet_address}</code>\n"
                             f"🏠 Node: <b>{node_name}</b>\n"
                             f"🗓 {now_iso}\n"
-                            f"💸 {direction} de <b>{abs(delta):,.4f} MAS</b>\n"
-                            f"💰 Nouveau solde : <b>{final_balance:,.4f} MAS</b>"
+                            f"💸 {direction} of <b>{abs(delta):,.4f} MAS</b>\n"
+                            f"💰 New balance: <b>{final_balance:,.4f} MAS</b>"
                         )
                         await send_alert(
                             alert_type="wallet_balance_drop" if delta < 0 else "wallet_balance_up",
