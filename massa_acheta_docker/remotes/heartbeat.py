@@ -29,7 +29,7 @@ async def heartbeat() -> None:
     try:
         while True:
             logger.info(f"[HEARTBEAT] Sleeping for {app_config['service']['heartbeat_period_hours'] * 60 * 60} seconds...")
-            await asyncio.sleep(app_config['service']['heartbeat_period_hours'] * 60 * 60)
+            await asyncio.sleep(app_config['service']['heartbeat_period_hours'] * 1 * 60)
             logger.info(f"[HEARTBEAT] Heartbeat planner schedule time")
 
             computed_rewards = await get_rewards_mas_day(rolls_number=100)
@@ -74,13 +74,13 @@ async def heartbeat() -> None:
                         show_days=True
                     )
                     # Infos réseau/stat (issus du get_status)
-                    network_stats = node.get('network_stats', {})
+                    network_stats = node.get('last_result', {}).get('network_stats', {})
                     in_con = network_stats.get('in_connection_count', '?')
                     out_con = network_stats.get('out_connection_count', '?')
                     peers = network_stats.get('known_peer_count', '?')
                     banned = network_stats.get('banned_peer_count', '?')
 
-                    consensus = node.get('consensus_stats', {})
+                    consensus = node.get('last_result', {}).get('consensus_stats', {})
                     final_blocks = consensus.get('final_block_count', '?')
                     stale_blocks = consensus.get('stale_block_count', '?')
 
