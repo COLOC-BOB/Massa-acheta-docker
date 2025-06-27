@@ -19,7 +19,7 @@ ALERT_COOLDOWNS = {
     "wallet_block_miss": 120,
     "wallet_block_produced": 5,
     "watcher_block_produced": 5,
-    "release_update": 1800,     # 30 minutes
+    "release_update": 60,     # 30 minutes
 }
 
 ALERT_LABELS = {
