@@ -25,13 +25,13 @@ def format_block_info(block_data):
     slot = header.get('slot', {})
     ops_count = len(block_data['content']['block'].get('operations', []))
     explorer_url = f"https://explorer.massa.net/mainnet/block/{block_id}"
-    # Pas de preview, juste l’URL "plate"
+    # No preview, just the plain URL
     return (
-        f"✅ <b>Nouveau block produit</b>\n"
+        f"✅ <b>New block produced</b>\n"
         f"🔹 Block: <code>{block_id}</code>\n"
         f"🔹 Slot: thread {slot.get('thread', '?')} / period {slot.get('period', '?')}\n"
-        f"🔹 Opérations dans le block: {ops_count}\n"
-        f"🔹 Voir dans l'explorer: {explorer_url}"
+        f"🔹 Operations in block: {ops_count}\n"
+        f"🔹 View on explorer: {explorer_url}"
     )
 
 async def get_block_info(block_id, api_url):

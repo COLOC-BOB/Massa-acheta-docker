@@ -110,13 +110,13 @@ async def watch_missed_blocks(polling_interval=30):
                                 seen.add(key_tuple)
 
                                 message = (
-                                    f"❌ <b>Bloc manqué détecté</b>\n"
+                                    f"❌ <b>Missed block detected</b>\n"
                                     f"👛 Wallet: <code>{wallet_address}</code>\n"
                                     f"🏠 Node: <b>{node_name}</b>\n"
                                     f"🌀 Cycle: <b>{cycle_num}</b>\n"
-                                    f"⛔ Total manqués ce cycle: <b>{missed}</b>\n"
+                                    f"⛔ Total missed this cycle: <b>{missed}</b>\n"
                                     f"🕒 {now_iso}\n"
-                                    f"🗂 Ajouté à l'historique."
+                                    f"🗂 Added to history."
                                 )
                                 await send_alert(
                                     alert_type="wallet_block_miss",

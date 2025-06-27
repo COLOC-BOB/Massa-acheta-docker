@@ -26,7 +26,7 @@ async def cmd_watchers_menu(message: types.Message, state: FSMContext):
 @router.message(F.text == "/watchers")
 async def show_watchers_menu(message: types.Message):
     kb = build_watchers_kb()
-    await message.answer("👀 <b>Watchers actifs :</b>\nClique pour activer/désactiver.", reply_markup=kb, parse_mode="HTML")
+    await message.answer("👀 <b>Active watchers:</b>\nTap to enable/disable.", reply_markup=kb, parse_mode="HTML")
 
 @router.callback_query(F.data.startswith("toggle_watcher_"))
 async def toggle_watcher(query: types.CallbackQuery):
@@ -34,7 +34,7 @@ async def toggle_watcher(query: types.CallbackQuery):
     config = load_watchers_config()
     new_state = not config.get(watcher_name, True)
     set_watcher_state(watcher_name, new_state)
-    await query.answer(f"{watcher_name} {'activé' if new_state else 'désactivé'}")
+    await query.answer(f"{watcher_name} {'enabled' if new_state else 'disabled'}")
     # Refresh the menu
     kb = build_watchers_kb()
     await query.message.edit_reply_markup(reply_markup=kb)
