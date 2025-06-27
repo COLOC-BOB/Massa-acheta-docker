@@ -110,12 +110,12 @@ async def watch_deferred_credits(polling_interval=30):
 
                             # Notification via alert manager
                             message = (
-                                f"💰 <b>Nouveau crédit différé détecté</b>\n"
+                                f"💰 <b>New deferred credit detected</b>\n"
                                 f"👛 Wallet: <code>{wallet_address}</code>\n"
                                 f"🏠 Node: <b>{node_name}</b>\n"
-                                f"⏳ Période: <b>{period}</b> / Thread: <b>{thread}</b>\n"
-                                f"💸 Montant: <b>{amount} MAS</b>\n"
-                                f"🕒 Ajouté à l'historique."
+                                f"⏳ Period: <b>{period}</b> / Thread: <b>{thread}</b>\n"
+                                f"💸 Amount: <b>{amount} MAS</b>\n"
+                                f"🕒 Added to history."
                             )
                             await send_alert(
                                 alert_type="wallet_deferred_credit",
