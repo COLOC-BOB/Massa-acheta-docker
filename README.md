@@ -22,8 +22,8 @@ You can deploy MASSA Acheta easily using Docker for a reproducible, isolated set
 > You can get your own Telegram ID here: https://t.me/getmyid_bot
 
    ```
-   echo "ACHETA_KEY=YOUR_TELEGRAM_BOT_TOKEN" > .env
-   echo "ACHETA_CHAT=YOUR_TELEGRAM_ID" >> .env
+   ACHETA_KEY="YOUR_TELEGRAM_BOT_TOKEN"
+   ACHETA_CHAT="YOUR_TELEGRAM_ID"
    ```
    
 
